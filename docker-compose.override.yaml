@@ -2,19 +2,19 @@
 # to provide dependencies and expose ports for local testing
 
 services:
-  ffc-template-node:
+  ffc-ahwr-sfd-messaging-proxy:
     build:
       target: development
-    image: ffc-template-node-development
-    container_name: ffc-template-node-development
+    image: ffc-ahwr-sfd-messaging-proxy-development
+    container_name: ffc-ahwr-sfd-messaging-proxy-development
     ports:
-      - "3000:3000"
-      - "9229:9229"
+      - "3007:3000"
+      - "9237:9229"
     volumes:
       - ./app:/home/node/app
       - ./package.json:/home/node/package.json
 
 networks:
-  ffc-template-node:
-    name: ffc-template-node
+  ffc-ahwr-sfd-messaging-proxy:
+    name: ffc-ahwr-sfd-messaging-proxy
     driver: bridge
