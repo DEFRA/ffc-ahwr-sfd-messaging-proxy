@@ -5,8 +5,7 @@ namespace: ffc-ahwr
 workstream: ffc-ahwr
 image: ffc-ahwr-sfd-messaging-proxy
 
-labels:
-  test: label 1
+labels: {}
 
 aadPodIdentity: true
 
