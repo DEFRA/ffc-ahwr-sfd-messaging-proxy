@@ -31,10 +31,10 @@ deployment:
   memoryThreshold: 80
   minReadySeconds: 0
   minReplicas: 1
-  maxReplicas: 1
+  maxReplicas: 2
   priorityClassName: default
   restartPolicy: Always
-  replicas: 1
+  replicas: 2
 
 container:
   imagePullPolicy: IfNotPresent
