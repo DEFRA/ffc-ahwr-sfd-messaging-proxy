@@ -20,7 +20,7 @@ services:
   ffc-ahwr-sfd-messaging-proxy-postgres:
     image: postgres:11.4-alpine
     environment:
-      POSTGRES_DB: ffc-ahwr-sfd-messaging-proxy
+      POSTGRES_DB: ffc_ahwr_sfd_messaging_proxy
       POSTGRES_PASSWORD: ppp
       POSTGRES_USERNAME: postgres
     volumes:
