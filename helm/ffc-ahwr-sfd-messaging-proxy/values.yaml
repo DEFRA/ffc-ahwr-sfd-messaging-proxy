@@ -36,6 +36,7 @@ deployment:
   replicas: 1
 
 container:
+  imagePullPolicy: IfNotPresent
   requestMemory: 100Mi
   requestCpu: 100m
   limitMemory: 200Mi
