@@ -4,4 +4,5 @@ data:
   NODE_ENV: {{ .Values.environment | quote }}
   PORT: {{ .Values.container.port | quote }}
   APPINSIGHTS_CLOUDROLE: {{ .Chart.Name | quote }}
+  TEST_NEW: {{ .Values.environment | quote }}
 {{- end -}}
