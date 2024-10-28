@@ -24,7 +24,7 @@
       <column name="data" type="JSONB">
         <constraints nullable="false" />
       </column>
-      <column name="status" type="VARCHAR(50)">
+      <column name="status" type="VARCHAR(50)" defaultValue="UNKNOWN">
         <constraints nullable="false" />
       </column>
     </createTable>
