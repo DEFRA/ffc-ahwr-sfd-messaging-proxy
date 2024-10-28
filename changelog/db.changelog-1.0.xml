@@ -12,35 +12,17 @@
       <column name="id" type="UUID" defaultValueComputed="public.uuid_generate_v4()">
         <constraints nullable="false" primaryKey="true" primaryKeyName="messageLogId_pkey" />
       </column>
-      <column name="crn" type="VARCHAR(12)">
+      <column name="agreementReference" type="VARCHAR(14)">
         <constraints nullable="false" />
       </column>
-      <column name="sbi" type="VARCHAR(12)">
+      <column name="claimReference" type="VARCHAR(14)">
         <constraints nullable="false" />
       </column>
-      <column name="reference" type="VARCHAR(14)">
-        <constraints nullable="false" />
-      </column>
-      <column name="notifyTemplateId" type="VARCHAR(50)">
-        <constraints nullable="false" />
-      </column>
-      <column name="sourceSystem" type="VARCHAR(50)">
-        <constraints nullable="false" />
-      </column>
-      <column name="commsType" type="VARCHAR(50)">
-        <constraints nullable="false" />
-      </column>
-      <column name="commsAddress" type="VARCHAR(50)">
-        <constraints nullable="false" />
-      </column>
-       <column name="personalisation" type="VARCHAR(50)">
-        <constraints nullable="false" />
-      </column>
-      <column defaultValueComputed="now()" name="createdAt" type="TIMESTAMP WITH TIME ZONE">
+      <column name="templateId" type="VARCHAR(50)">
         <constraints nullable="false" />
       </column>
       <column name="data" type="JSONB">
-        <constraints nullable="true" />
+        <constraints nullable="false" />
       </column>
       <column name="status" type="VARCHAR(50)">
         <constraints nullable="false" />
