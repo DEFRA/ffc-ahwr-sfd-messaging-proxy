@@ -1,4 +1,4 @@
-import health from '../routes/health.js'
+const health = require('../routes/health.js')
 
 const plugin = {
   plugin: {
@@ -11,4 +11,4 @@ const plugin = {
   }
 }
 
-export default plugin
+module.exports = plugin

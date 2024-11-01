@@ -1,4 +1,4 @@
-import { createServer } from '../../../../app/server.js'
+const { createServer } = require('../../../../app/server.js')
 
 describe('Server test', () => {
   test('createServer returns server', async () => {
