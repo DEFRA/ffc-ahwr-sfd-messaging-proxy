@@ -8,4 +8,7 @@ data:
   POSTGRES_HOST: {{ quote .Values.postgresService.postgresExternalName }}
   POSTGRES_PORT: {{ quote .Values.postgresService.postgresPort }}
   POSTGRES_SCHEMA_NAME: {{ quote .Values.postgresService.postgresSchema }}
+  MESSAGE_QUEUE_HOST: {{ quote .Values.container.messageQueueHost }}
+  SFDMESSAGEREQUEST_QUEUE_ADDRESS: {{ quote .Values.container.sfdMessageRequestQueueAddress }}
+  SFDMESSAGE_TOPIC_ADDRESS: {{ quote .Values.container.sfdMessageTopicAddress }}
 {{- end -}}

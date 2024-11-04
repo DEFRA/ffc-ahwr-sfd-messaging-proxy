@@ -1,4 +1,4 @@
-const config = {
+module.exports = {
   collectCoverage: true,
   collectCoverageFrom: [
     '**/*.js',
@@ -13,7 +13,6 @@ const config = {
     '<rootDir>/node_modules/',
     '<rootDir>/test-output/',
     '<rootDir>/test/',
-    '<rootDir>/rename.js',
     '<rootDir>/jest.config.js'
   ],
   modulePathIgnorePatterns: [
@@ -27,13 +26,16 @@ const config = {
         suiteName: 'jest tests',
         outputDirectory: 'test-output',
         outputName: 'junit.xml'
-      }
+      },
+      'jest-skipped-reporter'
     ]
   ],
   testEnvironment: 'node',
   testPathIgnorePatterns: [],
-  verbose: true,
-  transform: {}
+  verbose: false,
+  setupFilesAfterEnv: [
+    '<rootDir>/test/setup.js',
+    '<rootDir>/test/teardown.js'
+  ],
+  workerIdleMemoryLimit: '500MB'
 }
-
-export default config

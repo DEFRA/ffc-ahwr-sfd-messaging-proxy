@@ -1,7 +1,7 @@
-import Blipp from 'blipp'
-import logging from './logging.js'
-import router from './router.js'
-import config from '../config.js'
+const Blipp = require('blipp')
+const logging = require('./logging.js')
+const router = require('./router.js')
+const config = require('../config.js')
 
 async function registerPlugins (server) {
   const plugins = [
@@ -16,4 +16,6 @@ async function registerPlugins (server) {
   await server.register(plugins)
 }
 
-export { registerPlugins }
+module.exports = {
+  registerPlugins
+}

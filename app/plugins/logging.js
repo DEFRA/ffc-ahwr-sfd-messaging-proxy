@@ -1,4 +1,4 @@
-import HapiPino from 'hapi-pino'
+const HapiPino = require('hapi-pino')
 
 const plugin = {
   plugin: HapiPino,
@@ -8,4 +8,4 @@ const plugin = {
   }
 }
 
-export default plugin
+module.exports = plugin

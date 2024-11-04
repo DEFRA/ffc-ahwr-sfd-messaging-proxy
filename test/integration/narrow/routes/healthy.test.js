@@ -1,4 +1,4 @@
-import { createServer } from '../../../../app/server.js'
+const { createServer } = require('../../../../app/server.js')
 
 describe('healthy test', () => {
   let server
