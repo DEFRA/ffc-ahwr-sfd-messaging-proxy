@@ -45,6 +45,7 @@ container:
   port: 3000
   messageQueueHost: namespace.servicebus.windows.net
   sfdMessageRequestQueueAddress: ffc-ahwr-sfd-message
+  sfdMessageTopicAddress: ffc-ahwr-sfd-msg-request
 
 postgresService:
   postgresDb: ffc_ahwr_sfd_messaging_proxy

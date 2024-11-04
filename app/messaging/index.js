@@ -1,5 +1,5 @@
 const { MessageReceiver } = require('ffc-messaging')
-const { sfdMessageRequestQueue } = require('../app/config/index').messageQueueConfig
+const { sfdMessageRequestQueue } = require('../config/index').messageQueueConfig
 const processMessageRequest = require('./process-message-request')
 
 let sfdMessageReceiver

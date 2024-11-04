@@ -1,6 +1,6 @@
 const { setup } = require('./insights.js')
 require('log-timestamp')
-const messaging = require('../messaging')
+const messaging = require('./messaging/index.js')
 const { createServer } = require('./server.js')
 
 let serverLogger

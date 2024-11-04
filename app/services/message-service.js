@@ -1,7 +1,8 @@
 const { v4: uuidv4 } = require('uuid')
 const joi = require('joi')
-const { applicationMessageSchema } = require('../../messaging/message-request-schema')
+const { applicationMessageSchema } = require('../messaging/message-request-schema')
 const { set } = require('../repositories/message-log-repository')
+const { sendSfdMessageRequest } = require('../messaging/forward-message-request-to-sfd')
 
 const messageLogSchema = joi.object({
   id: joi.string().guid({ version: 'uuidv4' }).required(),
@@ -68,8 +69,7 @@ const storeMessages = async (logger, appMessage, sfdMessage) => {
 
 const sendMessageToSfd = async (logger, sfdMessage) => {
   try {
-    // TODO AHWR-183 implement
-    logger.warn('Implement send to topic!')
+    sendSfdMessageRequest(sfdMessage)
   } catch (error) {
     logger.error(`Failed to send message to single front door. ${error.message}`)
     throw new Error(`Failed to send message to single front door. ${error.message}`)

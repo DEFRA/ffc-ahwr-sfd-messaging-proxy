@@ -1,4 +1,5 @@
 const joi = require('joi')
+const msgTypePrefix = 'uk.gov.ffc.ahwr'
 
 const sharedConfigSchema = {
   appInsights: joi.object(),
@@ -13,7 +14,12 @@ const schema = joi.object({
     address: joi.string(),
     type: joi.string(),
     ...sharedConfigSchema
-  }
+  },
+  sfdMessageTopic: {
+    address: joi.string(),
+    ...sharedConfigSchema
+  },
+  sfdMessageRequestMsgType: joi.string()
 })
 
 const sharedConfig = {
@@ -29,7 +35,12 @@ const config = {
     address: process.env.SFDMESSAGEREQUEST_QUEUE_ADDRESS,
     type: 'queue',
     ...sharedConfig
-  }
+  },
+  sfdMessageTopic: {
+    address: process.env.SFDMESSAGE_TOPIC_ADDRESS,
+    ...sharedConfig
+  },
+  sfdMessageRequestMsgType: `${msgTypePrefix}.submit.sfd.message.request`
 }
 
 const { error, value } = schema.validate(config, { abortEarly: false })

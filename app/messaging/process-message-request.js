@@ -1,5 +1,5 @@
 const { validateMessageRequest } = require('./message-request-schema')
-const { sendMessageToSingleFrontDoor } = require('../app/services/message-service')
+const { sendMessageToSingleFrontDoor } = require('../services/message-service')
 
 const processMessageRequest = async (logger, message, receiver) => {
   try {
