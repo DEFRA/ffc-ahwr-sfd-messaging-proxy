@@ -1,6 +1,6 @@
 const joi = require('joi')
 
-const nineDigitId = joi.string().min(105000000).max(999999999).required()
+const nineDigitId = joi.string().min(105000000).max(999999999)
 const email = joi
   .string()
   .pattern(
@@ -18,8 +18,8 @@ const outboundSfdMessageSchema = joi.object({
   time: joi.date(),
   data: joi
     .object({
-      crn: nineDigitId,
-      sbi: nineDigitId,
+      crn: nineDigitId.required(),
+      sbi: nineDigitId.required(),
       sourceSystem: joi
         .string()
         .min(3)
@@ -28,7 +28,11 @@ const outboundSfdMessageSchema = joi.object({
         .required(),
       notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
       commsType: 'email',
-      commsAddress: joi.alternatives().try(email, joi.array().items(email))
+      commsAddress: joi.alternatives().try(email, joi.array().items(email)),
+      personalisation: joi.object().required(),
+      reference: joi.string().min(1).min(100).required(),
+      oneClickUnsubscribeUrl: joi.string().min(1),
+      emailReplyToId: joi.string().guid({ version: 'uuidv4' })
     })
     .required()
 })
@@ -43,8 +47,8 @@ const messageLogTableSchema = joi.object({
 })
 
 const inboundMessageSchema = joi.object({
-  crn: nineDigitId,
-  sbi: nineDigitId
+  crn: nineDigitId.required(),
+  sbi: nineDigitId.required()
 })
 
 module.exports = {

@@ -11,13 +11,21 @@ const sendMessageToSingleFrontDoor = async (logger, appMessage) => {
   validateInboundMessage(logger, appMessage)
 
   const messageId = uuidv4()
-  const sfdMessage = buildSfdMessageFrom(messageId, appMessage)
+  const outboundMessage = buildOutboundMessage(messageId, appMessage)
 
-  await storeMessages(logger, appMessage, sfdMessage)
+  const databaseMessage = {
+    id: messageId,
+    agreementReference: appMessage.crn,
+    claimReference: 'fake-claim-1',
+    templateId: 'fake-template-1',
+    data: outboundMessage
+  }
 
-  await sendMessageToSfd(logger, sfdMessage)
+  await storeMessages(logger, appMessage, databaseMessage)
 
-  return sfdMessage
+  await sendMessageToSfd(logger, outboundMessage)
+
+  return outboundMessage // does this function need to return anything?
 }
 
 const validateInboundMessage = (logger, appMessage) => {
@@ -31,33 +39,45 @@ const validateInboundMessage = (logger, appMessage) => {
   }
 }
 
-const buildSfdMessageFrom = (messageId, appMessage) => {
+const buildOutboundMessage = (messageId, appMessage) => {
+  const service = 'ffc-ahwr' // maybe ffc-ahwp?
+
   const data = {
-    crn: appMessage.crn,
-    sbi: appMessage.sbi,
-    sourceSystem: 'SOMEWHERE'
+    id: messageId,
+    source: service,
+    specversion: '1.0',
+    type: 'uk.gov.ffc.ahwr.comms.request', // maybe ffc-ahwp?
+    datacontenttype: 'application/json',
+    time: new Date(),
+    data: {
+      crn: appMessage.crn,
+      sbi: appMessage.sbi,
+      sourceSystem: service, // Does this need to be in the data as well as in the root level object?
+      notifyTemplateId: 'uuid',
+      commsType: 'email',
+      commsAddress: 'an@email.com', // This should maybe always be an array, rather than optionally being an array
+      personalisation: {},
+      reference: `${service}-${messageId}`,
+      oneClickUnsubscribeUrl: 'https://unsubscribe.example.com',
+      emailReplyToId: uuidv4()
+    }
   }
 
-  return {
-    id: messageId,
-    agreementReference: appMessage.crn,
-    claimReference: 'fake-claim-1',
-    templateId: 'fake-template-1',
-    data
-  }
+  return data
 }
 
-const storeMessages = async (logger, appMessage, sfdMessage) => {
-  const { error } = messageLogTableSchema.validate(sfdMessage, {
+const storeMessages = async (logger, appMessage, databaseMessage) => {
+  const { error } = messageLogTableSchema.validate(databaseMessage, {
     abortEarly: false
   })
+
   if (error) {
     const errorMessage = `The single front door message is invalid. ${error.message}`
     logAndThrowError(errorMessage, logger)
   }
 
   try {
-    await set(logger, sfdMessage)
+    await set(logger, databaseMessage)
   } catch (error) {
     const errorMessage = `Failed to save single front door message. ${error.message}`
     logAndThrowError(errorMessage, logger)

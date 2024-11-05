@@ -1,4 +1,4 @@
-const inboundMessageSchema = require('../schemas/index')
+const { inboundMessageSchema } = require('../schemas/index')
 
 const validateMessageRequest = (logger, event) => {
   const validate = inboundMessageSchema.validate(event)
