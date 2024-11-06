@@ -1,48 +1,38 @@
 const { v4: uuidv4 } = require('uuid')
-const { inboundMessageSchema } = require('../messaging/message-request-schema')
 const { set } = require('../repositories/message-log-repository')
-const {
-  sendSfdMessageRequest
-} = require('../messaging/forward-message-request-to-sfd')
+const { sendSfdMessageRequest } = require('../messaging/forward-message-request-to-sfd')
 const { logAndThrowError } = require('../logging/index')
-const { messageLogTableSchema } = require('../schemas/index')
+const { inboundMessageSchema, messageLogTableSchema } = require('../schemas/index')
+const { sourceSystem } = require('../constants/index')
 
-const sendMessageToSingleFrontDoor = async (logger, appMessage) => {
-  validateInboundMessage(logger, appMessage)
+const sendMessageToSingleFrontDoor = async (logger, inboundMessage) => {
+  validateInboundMessage(logger, inboundMessage)
 
-  const messageId = uuidv4()
-  const outboundMessage = buildOutboundMessage(messageId, appMessage)
+  const outboundMessage = buildOutboundMessage(inboundMessage)
 
-  const databaseMessage = {
-    id: messageId,
-    agreementReference: appMessage.crn,
-    claimReference: 'fake-claim-1',
-    templateId: 'fake-template-1',
-    data: outboundMessage
-  }
-
-  await storeMessages(logger, appMessage, databaseMessage)
+  await storeMessages(logger, inboundMessage, outboundMessage)
 
   await sendMessageToSfd(logger, outboundMessage)
 
   return outboundMessage // does this function need to return anything?
 }
 
-const validateInboundMessage = (logger, appMessage) => {
-  const { error } = inboundMessageSchema.validate(appMessage, {
+const validateInboundMessage = (logger, inboundMessage) => {
+  const { error } = inboundMessageSchema.validate(inboundMessage, {
     abortEarly: false
   })
 
   if (error) {
-    const errorMessage = `The application message is invalid. ${error.message}`
+    const errorMessage = `The inbound message is invalid. ${error.message}`
     logAndThrowError(errorMessage, logger)
   }
 }
 
-const buildOutboundMessage = (messageId, appMessage) => {
-  const service = 'ffc-ahwr' // maybe ffc-ahwp?
+const buildOutboundMessage = (inboundMessage) => {
+  const service = sourceSystem
+  const messageId = uuidv4()
 
-  const data = {
+  return {
     id: messageId,
     source: service,
     specversion: '1.0',
@@ -50,10 +40,10 @@ const buildOutboundMessage = (messageId, appMessage) => {
     datacontenttype: 'application/json',
     time: new Date(),
     data: {
-      crn: appMessage.crn,
-      sbi: appMessage.sbi,
+      crn: inboundMessage.crn,
+      sbi: inboundMessage.sbi,
       sourceSystem: service, // Does this need to be in the data as well as in the root level object?
-      notifyTemplateId: 'uuid',
+      notifyTemplateId: uuidv4(),
       commsType: 'email',
       commsAddress: 'an@email.com', // This should maybe always be an array, rather than optionally being an array
       personalisation: {},
@@ -62,17 +52,23 @@ const buildOutboundMessage = (messageId, appMessage) => {
       emailReplyToId: uuidv4()
     }
   }
-
-  return data
 }
 
-const storeMessages = async (logger, appMessage, databaseMessage) => {
+const storeMessages = async (logger, inboundMessage, outboundMessage) => {
+  const databaseMessage = {
+    id: outboundMessage.id,
+    agreementReference: inboundMessage.agreementReference,
+    claimReference: inboundMessage.crn + '',
+    templateId: 'fake-template-1',
+    data: outboundMessage
+  }
+
   const { error } = messageLogTableSchema.validate(databaseMessage, {
     abortEarly: false
   })
 
   if (error) {
-    const errorMessage = `The single front door message is invalid. ${error.message}`
+    const errorMessage = `The message log database item is invalid. ${error.message}`
     logAndThrowError(errorMessage, logger)
   }
 
@@ -84,11 +80,11 @@ const storeMessages = async (logger, appMessage, databaseMessage) => {
   }
 }
 
-const sendMessageToSfd = async (logger, sfdMessage) => {
+const sendMessageToSfd = async (logger, outboundMessage) => {
   try {
-    sendSfdMessageRequest(sfdMessage)
+    sendSfdMessageRequest(outboundMessage)
   } catch (error) {
-    const errorMessage = `Failed to send message to single front door. ${error.message}`
+    const errorMessage = `Failed to send outbound message to single front door. ${error.message}`
     logAndThrowError(errorMessage, logger)
   }
 }

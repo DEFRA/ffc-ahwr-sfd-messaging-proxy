@@ -1,19 +1,17 @@
 const joi = require('joi')
 
-const nineDigitId = joi.string().min(105000000).max(999999999)
+const nineDigitId = joi.number().min(105000000).max(999999999)
 const email = joi
   .string()
-  .pattern(
-    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}(\\.[a-zA-Z]{2,})?$/
-  )
+  .pattern(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/)
   .min(1)
   .max(320)
 
-const outboundSfdMessageSchema = joi.object({
+const outboundMessageSchema = joi.object({
   id: joi.string().guid({ version: 'uuidv4' }).required(),
   source: joi.string().min(1).max(100).required(),
   specversion: joi.string().min(3).max(10).required(),
-  type: joi.string.min(3).max(250).required(),
+  type: joi.string().min(3).max(250).required(),
   datacontenttype: joi.string(),
   time: joi.date(),
   data: joi
@@ -30,7 +28,7 @@ const outboundSfdMessageSchema = joi.object({
       commsType: 'email',
       commsAddress: joi.alternatives().try(email, joi.array().items(email)),
       personalisation: joi.object().required(),
-      reference: joi.string().min(1).min(100).required(),
+      reference: joi.string().min(1).max(100).required(),
       oneClickUnsubscribeUrl: joi.string().min(1),
       emailReplyToId: joi.string().guid({ version: 'uuidv4' })
     })
@@ -42,18 +40,19 @@ const messageLogTableSchema = joi.object({
   agreementReference: joi.string().max(14).required(),
   claimReference: joi.string().max(14),
   templateId: joi.string().max(50).required(),
-  data: outboundSfdMessageSchema.required(),
+  data: outboundMessageSchema.required(),
   status: joi.string().max(50)
 })
 
 const inboundMessageSchema = joi.object({
   crn: nineDigitId.required(),
-  sbi: nineDigitId.required()
+  sbi: nineDigitId.required(),
+  agreementReference: joi.string()
 })
 
 module.exports = {
   inboundMessageSchema,
   messageLogTableSchema,
-  outboundSfdMessageSchema,
+  outboundMessageSchema,
   nineDigitId
 }
