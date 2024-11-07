@@ -47,7 +47,11 @@ const messageLogTableSchema = joi.object({
 const inboundMessageSchema = joi.object({
   crn: nineDigitId.required(),
   sbi: nineDigitId.required(),
-  agreementReference: joi.string()
+  agreementReference: joi.string().required(),
+  claimReference: joi.string().max(14),
+  notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
+  emailAddresses: joi.alternatives().try(email, joi.array().items(email)).required(),
+  customParams: joi.array().required()
 })
 
 module.exports = {

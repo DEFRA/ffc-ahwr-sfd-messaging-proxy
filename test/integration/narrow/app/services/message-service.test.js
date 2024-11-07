@@ -1,9 +1,22 @@
 const { sendMessageToSingleFrontDoor } = require('../../../../../app/services/message-service')
 
 describe('sendMessageToSingleFrontDoor', () => {
-  const validInboundMessage = { crn: 123456789, sbi: 123456789, agreementReference: 'IAHW-C3A1-5899' }
+  const validInboundMessage = {
+    crn: 123456789,
+    sbi: 123456789,
+    agreementReference: 'IAHW-C3A1-5899',
+    notifyTemplateId: '183565fc-5684-40c1-a11d-85f55aff4d45',
+    emailAddresses: ['an@email.com'],
+    customParams: []
+  }
   const emptyInboundMessage = {}
-  const inboundMessageNoAgreementRef = { crn: 123456789, sbi: 123456789 }
+  const inboundMessageNoAgreementRef = {
+    crn: 123456789,
+    sbi: 123456789,
+    notifyTemplateId: '183565fc-5684-40c1-a11d-85f55aff4d45',
+    emailAddresses: ['an@email.com'],
+    customParams: []
+  }
 
   let mockedLogger
 
@@ -24,10 +37,11 @@ describe('sendMessageToSingleFrontDoor', () => {
 
   test('throws an error when inbound message is invalid', async () => {
     await expect(sendMessageToSingleFrontDoor(mockedLogger, emptyInboundMessage)).rejects.toThrow('The inbound message is invalid. "crn" is required')
-    expect(mockedLogger.error).toHaveBeenCalledWith('The inbound message is invalid. "crn" is required. "sbi" is required')
+    expect(mockedLogger.error).toHaveBeenCalledWith('The inbound message is invalid. "crn" is required. "sbi" is required. "agreementReference" is required. "notifyTemplateId" is required. "emailAddresses" is required. "customParams" is required')
   })
 
-  test('throws an error when message log database item is invalid', async () => {
+  // TODO AHWR-183 is this possible now we have inbound message validation?
+  test.skip('throws an error when message log database item is invalid', async () => {
     await expect(sendMessageToSingleFrontDoor(mockedLogger, inboundMessageNoAgreementRef)).rejects.toThrow('The message log database item is invalid. "agreementReference" is required')
     expect(mockedLogger.error).toHaveBeenCalledWith('The message log database item is invalid. "agreementReference" is required')
   })
@@ -56,4 +70,10 @@ describe('sendMessageToSingleFrontDoor', () => {
 describe('buildOutboundMessage', () => {
   test.skip('TODO', async () => {
   })
+  // TODO AHWR-183 Min and Max populated inbound message for the following:
+  // Farmer Apply - confirm existing user V3.0
+  // Farmer Apply - confirm new user V3.0
+  // Farmer Claim - Complete
+  // Farmer Claim - Endemics Follow-up
+  // Farmer Claim - Endemics Review
 })

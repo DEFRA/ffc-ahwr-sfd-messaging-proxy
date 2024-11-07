@@ -35,7 +35,7 @@ const buildOutboundMessage = (inboundMessage) => {
   return {
     id: messageId,
     source: service,
-    specversion: '1.0',
+    specversion: '1.0.2',
     type: 'uk.gov.ffc.ahwr.comms.request', // maybe ffc-ahwp?
     datacontenttype: 'application/json',
     time: new Date(),
@@ -47,9 +47,7 @@ const buildOutboundMessage = (inboundMessage) => {
       commsType: 'email',
       commsAddress: 'an@email.com', // This should maybe always be an array, rather than optionally being an array
       personalisation: {},
-      reference: `${service}-${messageId}`,
-      oneClickUnsubscribeUrl: 'https://unsubscribe.example.com',
-      emailReplyToId: uuidv4()
+      reference: `${service}-${messageId}`
     }
   }
 }
