@@ -35,15 +35,6 @@ const outboundMessageSchema = joi.object({
     .required()
 })
 
-const messageLogTableSchema = joi.object({
-  id: joi.string().guid({ version: 'uuidv4' }).required(),
-  agreementReference: joi.string().max(14).required(),
-  claimReference: joi.string().max(14),
-  templateId: joi.string().max(50).required(),
-  data: outboundMessageSchema.required(),
-  status: joi.string().max(50)
-})
-
 const inboundMessageSchema = joi.object({
   crn: nineDigitId.required(),
   sbi: nineDigitId.required(),
@@ -52,6 +43,19 @@ const inboundMessageSchema = joi.object({
   notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
   emailAddresses: joi.alternatives().try(email, joi.array().items(email)).required(),
   customParams: joi.array().required()
+})
+
+const messageLogTableSchema = joi.object({
+  id: joi.string().guid({ version: 'uuidv4' }).required(),
+  agreementReference: joi.string().max(14).required(),
+  claimReference: joi.string().max(14),
+  templateId: joi.string().max(50).required(),
+  data: joi.object({
+    inboundMessageQueueId: joi.string().required(),
+    inboundMessage: inboundMessageSchema.required(),
+    outboundMessage: outboundMessageSchema.required()
+  }).required(),
+  status: joi.string().max(50)
 })
 
 module.exports = {

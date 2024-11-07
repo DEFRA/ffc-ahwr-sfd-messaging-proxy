@@ -5,7 +5,7 @@ const processMessageRequest = async (logger, message, receiver) => {
   try {
     logger.warn(`Received sfd message request with id: ${message.messageId}`)
     const messageBody = message.body
-    if (validateMessageRequest(logger, messageBody)) {
+    if (validateMessageRequest(logger, message.messageId, messageBody)) {
       await sendMessageToSingleFrontDoor(logger, messageBody)
       await receiver.completeMessage(message)
     }

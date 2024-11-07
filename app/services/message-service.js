@@ -5,12 +5,12 @@ const { logAndThrowError } = require('../logging/index')
 const { inboundMessageSchema, messageLogTableSchema } = require('../schemas/index')
 const { sourceSystem } = require('../constants/index')
 
-const sendMessageToSingleFrontDoor = async (logger, inboundMessage) => {
+const sendMessageToSingleFrontDoor = async (logger, inboundMessageQueueId, inboundMessage) => {
   validateInboundMessage(logger, inboundMessage)
 
   const outboundMessage = buildOutboundMessage(inboundMessage)
 
-  await storeMessages(logger, inboundMessage, outboundMessage)
+  await storeMessages(logger, inboundMessageQueueId, inboundMessage, outboundMessage)
 
   await sendMessageToSfd(logger, outboundMessage)
 
@@ -52,13 +52,17 @@ const buildOutboundMessage = (inboundMessage) => {
   }
 }
 
-const storeMessages = async (logger, inboundMessage, outboundMessage) => {
+const storeMessages = async (logger, inboundMessageQueueId, inboundMessage, outboundMessage) => {
   const databaseMessage = {
     id: outboundMessage.id,
     agreementReference: inboundMessage.agreementReference,
     claimReference: inboundMessage.crn + '',
     templateId: 'fake-template-1',
-    data: outboundMessage
+    data: {
+      inboundMessageQueueId,
+      inboundMessage,
+      outboundMessage
+    }
   }
 
   const { error } = messageLogTableSchema.validate(databaseMessage, {
