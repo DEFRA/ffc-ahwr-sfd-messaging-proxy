@@ -42,7 +42,8 @@ const inboundMessageSchema = joi.object({
   claimReference: joi.string().max(14),
   notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
   emailAddresses: joi.alternatives().try(email, joi.array().items(email)).required(),
-  customParams: joi.array().required()
+  customParams: joi.array().required(),
+  dateTime: joi.date().required()
 })
 
 const messageLogTableSchema = joi.object({

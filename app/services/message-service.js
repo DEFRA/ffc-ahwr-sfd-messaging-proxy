@@ -1,20 +1,33 @@
 const { v4: uuidv4 } = require('uuid')
 const { set } = require('../repositories/message-log-repository')
-const { sendSfdMessageRequest } = require('../messaging/forward-message-request-to-sfd')
+const {
+  sendSfdMessageRequest
+} = require('../messaging/forward-message-request-to-sfd')
 const { logAndThrowError } = require('../logging/index')
-const { inboundMessageSchema, messageLogTableSchema } = require('../schemas/index')
-const { sourceSystem } = require('../constants/index')
+const {
+  inboundMessageSchema,
+  messageLogTableSchema
+} = require('../schemas/index')
+const { SOURCE_SYSTEM, MESSAGE_RESULT_MAP } = require('../constants/index')
 
-const sendMessageToSingleFrontDoor = async (logger, inboundMessageQueueId, inboundMessage) => {
+const sendMessageToSingleFrontDoor = async (
+  logger,
+  inboundMessageQueueId,
+  inboundMessage
+) => {
   validateInboundMessage(logger, inboundMessage)
 
   const outboundMessage = buildOutboundMessage(inboundMessage)
 
-  await storeMessages(logger, inboundMessageQueueId, inboundMessage, outboundMessage)
+  const { success } = await sendMessageToSfd(logger, outboundMessage)
 
-  await sendMessageToSfd(logger, outboundMessage)
-
-  return outboundMessage // does this function need to return anything?
+  await storeMessages(
+    logger,
+    inboundMessageQueueId,
+    inboundMessage,
+    outboundMessage,
+    success
+  )
 }
 
 const validateInboundMessage = (logger, inboundMessage) => {
@@ -29,7 +42,7 @@ const validateInboundMessage = (logger, inboundMessage) => {
 }
 
 const buildOutboundMessage = (inboundMessage) => {
-  const service = sourceSystem
+  const service = SOURCE_SYSTEM
   const messageId = uuidv4()
 
   return {
@@ -38,31 +51,40 @@ const buildOutboundMessage = (inboundMessage) => {
     specversion: '1.0.2',
     type: 'uk.gov.ffc.ahwr.comms.request', // maybe ffc-ahwp?
     datacontenttype: 'application/json',
-    time: new Date(),
+    time: inboundMessage.dateTime,
     data: {
       crn: inboundMessage.crn,
       sbi: inboundMessage.sbi,
-      sourceSystem: service, // Does this need to be in the data as well as in the root level object?
-      notifyTemplateId: uuidv4(),
+      sourceSystem: service,
+      notifyTemplateId: inboundMessage.notifyTemplateId,
       commsType: 'email',
-      commsAddress: 'an@email.com', // This should maybe always be an array, rather than optionally being an array
+      commsAddress: inboundMessage.commsAddress,
       personalisation: {},
       reference: `${service}-${messageId}`
     }
   }
 }
 
-const storeMessages = async (logger, inboundMessageQueueId, inboundMessage, outboundMessage) => {
+const storeMessages = async (
+  logger,
+  inboundMessageQueueId,
+  inboundMessage,
+  outboundMessage,
+  outboundMessageSuccessful
+) => {
   const databaseMessage = {
     id: outboundMessage.id,
     agreementReference: inboundMessage.agreementReference,
-    claimReference: inboundMessage.crn + '',
-    templateId: 'fake-template-1',
+    claimReference: inboundMessage.crn.toString(),
+    templateId: inboundMessage.notifyTemplateId,
     data: {
       inboundMessageQueueId,
       inboundMessage,
       outboundMessage
-    }
+    },
+    status: outboundMessageSuccessful
+      ? MESSAGE_RESULT_MAP.sent
+      : MESSAGE_RESULT_MAP.failed
   }
 
   const { error } = messageLogTableSchema.validate(databaseMessage, {
@@ -85,9 +107,12 @@ const storeMessages = async (logger, inboundMessageQueueId, inboundMessage, outb
 const sendMessageToSfd = async (logger, outboundMessage) => {
   try {
     sendSfdMessageRequest(outboundMessage)
+    return { success: true }
   } catch (error) {
-    const errorMessage = `Failed to send outbound message to single front door. ${error.message}`
-    logAndThrowError(errorMessage, logger)
+    logger.error(
+      `Failed to send outbound message to single front door. ${error.message}`
+    )
+    return { success: false }
   }
 }
 
