@@ -1,4 +1,4 @@
-const SOURCE_SYSTEM = 'ffc-ahwr' // TODO AHWR-183 maybe ffc-ahwp?
+const SOURCE_SYSTEM = 'ffc-ahwr'
 
 const MESSAGE_RESULT_MAP = {
   unknown: 'UNKNOWN',

@@ -50,7 +50,7 @@ const buildOutboundMessage = (messageId, inboundMessage) => {
     id: messageId,
     source: service,
     specversion: '1.0.2',
-    type: 'uk.gov.ffc.ahwr.comms.request', // TODO AHWR-183 maybe ffc-ahwp?
+    type: 'uk.gov.ffc.ahwr.comms.request',
     datacontenttype: 'application/json',
     time: inboundMessage.dateTime.toString(),
     data: {
