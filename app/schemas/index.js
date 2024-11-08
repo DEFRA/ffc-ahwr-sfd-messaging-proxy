@@ -1,6 +1,7 @@
 const joi = require('joi')
 
-const nineDigitId = joi.number().min(105000000).max(999999999)
+const crn = joi.number().min(1050000000).max(9999999999).required()
+const sbi = joi.number().min(105000000).max(999999999).required()
 const email = joi
   .string()
   .pattern(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/)
@@ -16,8 +17,8 @@ const outboundMessageSchema = joi.object({
   time: joi.date(),
   data: joi
     .object({
-      crn: nineDigitId.required(),
-      sbi: nineDigitId.required(),
+      crn,
+      sbi,
       sourceSystem: joi
         .string()
         .min(3)
@@ -26,7 +27,7 @@ const outboundMessageSchema = joi.object({
         .required(),
       notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
       commsType: 'email',
-      commsAddress: joi.array().items(email).required(),
+      commsAddress: email.required(),
       personalisation: joi.object().required(),
       reference: joi.string().min(1).max(100).required(),
       oneClickUnsubscribeUrl: joi.string().min(1),
@@ -36,12 +37,12 @@ const outboundMessageSchema = joi.object({
 })
 
 const inboundMessageSchema = joi.object({
-  crn: nineDigitId.required(),
-  sbi: nineDigitId.required(),
+  crn,
+  sbi,
   agreementReference: joi.string().required(),
   claimReference: joi.string().max(14),
   notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
-  emailAddresses: joi.array().items(email).required(),
+  emailAddress: email,
   customParams: joi.object().required(),
   dateTime: joi.date().required()
 })
@@ -62,6 +63,5 @@ const messageLogTableSchema = joi.object({
 module.exports = {
   inboundMessageSchema,
   messageLogTableSchema,
-  outboundMessageSchema,
-  nineDigitId
+  outboundMessageSchema
 }

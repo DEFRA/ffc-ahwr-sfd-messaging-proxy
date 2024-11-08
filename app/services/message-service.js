@@ -28,6 +28,8 @@ const sendMessageToSingleFrontDoor = async (
     outboundMessage,
     success
   )
+
+  return outboundMessage
 }
 
 const validateInboundMessage = (logger, inboundMessage) => {
@@ -58,8 +60,8 @@ const buildOutboundMessage = (inboundMessage) => {
       sourceSystem: service,
       notifyTemplateId: inboundMessage.notifyTemplateId,
       commsType: 'email',
-      commsAddress: inboundMessage.commsAddress,
-      personalisation: {},
+      commsAddress: inboundMessage.emailAddress,
+      personalisation: inboundMessage.customParams,
       reference: `${service}-${messageId}`
     }
   }
@@ -117,5 +119,6 @@ const sendMessageToSfd = async (logger, outboundMessage) => {
 }
 
 module.exports = {
-  sendMessageToSingleFrontDoor
+  sendMessageToSingleFrontDoor,
+  storeMessages
 }
