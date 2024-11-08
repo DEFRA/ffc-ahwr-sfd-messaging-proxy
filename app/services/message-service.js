@@ -17,7 +17,7 @@ const sendMessageToSingleFrontDoor = async (
 ) => {
   validateInboundMessage(logger, inboundMessage)
 
-  const outboundMessage = buildOutboundMessage(inboundMessage)
+  const outboundMessage = buildOutboundMessage(uuidv4(), inboundMessage)
 
   const { success } = await sendMessageToSfd(logger, outboundMessage)
 
@@ -43,17 +43,16 @@ const validateInboundMessage = (logger, inboundMessage) => {
   }
 }
 
-const buildOutboundMessage = (inboundMessage) => {
+const buildOutboundMessage = (messageId, inboundMessage) => {
   const service = SOURCE_SYSTEM
-  const messageId = uuidv4()
 
   return {
     id: messageId,
     source: service,
     specversion: '1.0.2',
-    type: 'uk.gov.ffc.ahwr.comms.request', // maybe ffc-ahwp?
+    type: 'uk.gov.ffc.ahwr.comms.request', // TODO AHWR-183 maybe ffc-ahwp?
     datacontenttype: 'application/json',
-    time: inboundMessage.dateTime,
+    time: inboundMessage.dateTime.toString(),
     data: {
       crn: inboundMessage.crn,
       sbi: inboundMessage.sbi,
@@ -74,10 +73,9 @@ const storeMessages = async (
   outboundMessage,
   outboundMessageSuccessful
 ) => {
-  const databaseMessage = {
+  let databaseMessage = {
     id: outboundMessage.id,
     agreementReference: inboundMessage.agreementReference,
-    claimReference: inboundMessage.crn.toString(),
     templateId: inboundMessage.notifyTemplateId,
     data: {
       inboundMessageQueueId,
@@ -85,8 +83,14 @@ const storeMessages = async (
       outboundMessage
     },
     status: outboundMessageSuccessful
-      ? MESSAGE_RESULT_MAP.sent
-      : MESSAGE_RESULT_MAP.failed
+      ? MESSAGE_RESULT_MAP.unknown
+      : MESSAGE_RESULT_MAP.unsent
+  }
+  if (inboundMessage.claimReference) {
+    databaseMessage = {
+      claimReference: inboundMessage.claimReference,
+      ...databaseMessage
+    }
   }
 
   const { error } = messageLogTableSchema.validate(databaseMessage, {
@@ -120,5 +124,5 @@ const sendMessageToSfd = async (logger, outboundMessage) => {
 
 module.exports = {
   sendMessageToSingleFrontDoor,
-  storeMessages
+  buildOutboundMessage
 }

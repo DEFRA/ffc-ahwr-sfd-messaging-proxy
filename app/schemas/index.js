@@ -51,13 +51,13 @@ const messageLogTableSchema = joi.object({
   id: joi.string().guid({ version: 'uuidv4' }).required(),
   agreementReference: joi.string().max(14).required(),
   claimReference: joi.string().max(14),
-  templateId: joi.string().max(50).required(),
+  templateId: joi.string().guid({ version: 'uuidv4' }).required(),
   data: joi.object({
     inboundMessageQueueId: joi.string().required(),
     inboundMessage: inboundMessageSchema.required(),
     outboundMessage: outboundMessageSchema.required()
   }).required(),
-  status: joi.string().max(50)
+  status: joi.string().max(50).required()
 })
 
 module.exports = {
