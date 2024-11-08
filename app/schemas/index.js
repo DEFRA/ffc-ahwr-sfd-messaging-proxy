@@ -26,7 +26,7 @@ const outboundMessageSchema = joi.object({
         .required(),
       notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
       commsType: 'email',
-      commsAddress: joi.alternatives().try(email, joi.array().items(email)),
+      commsAddress: joi.array().items(email).required(),
       personalisation: joi.object().required(),
       reference: joi.string().min(1).max(100).required(),
       oneClickUnsubscribeUrl: joi.string().min(1),
@@ -41,8 +41,8 @@ const inboundMessageSchema = joi.object({
   agreementReference: joi.string().required(),
   claimReference: joi.string().max(14),
   notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
-  emailAddresses: joi.alternatives().try(email, joi.array().items(email)).required(),
-  customParams: joi.array().required(),
+  emailAddresses: joi.array().items(email).required(),
+  customParams: joi.object().required(),
   dateTime: joi.date().required()
 })
 
