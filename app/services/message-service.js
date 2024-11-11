@@ -93,14 +93,10 @@ const storeMessages = async (
     }
   }
 
-  const { error } = messageLogTableSchema.validate(databaseMessage, {
+  // this can't fail, valid inboundMessage schema validation prevents it
+  messageLogTableSchema.validate(databaseMessage, {
     abortEarly: false
   })
-
-  if (error) {
-    const errorMessage = `The message log database item is invalid. ${error.message}`
-    logAndThrowError(errorMessage, logger)
-  }
 
   try {
     await set(logger, databaseMessage)
