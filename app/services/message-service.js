@@ -1,81 +1,124 @@
 const { v4: uuidv4 } = require('uuid')
-const joi = require('joi')
-const { applicationMessageSchema } = require('../messaging/message-request-schema')
 const { set } = require('../repositories/message-log-repository')
-const { sendSfdMessageRequest } = require('../messaging/forward-message-request-to-sfd')
+const {
+  sendSfdMessageRequest
+} = require('../messaging/forward-message-request-to-sfd')
+const { logAndThrowError } = require('../logging/index')
+const {
+  inboundMessageSchema,
+  messageLogTableSchema
+} = require('../schemas/index')
+const { SOURCE_SYSTEM, MESSAGE_RESULT_MAP } = require('../constants/index')
 
-const messageLogSchema = joi.object({
-  id: joi.string().guid({ version: 'uuidv4' }).required(),
-  agreementReference: joi.string().max(14).required(),
-  claimReference: joi.string().max(14),
-  templateId: joi.string().max(50).required(),
-  data: joi.object().required(), // TODO AHWR-183 impl
-  status: joi.string().max(50)
-})
+const sendMessageToSingleFrontDoor = async (
+  logger,
+  inboundMessageQueueId,
+  inboundMessage
+) => {
+  validateInboundMessage(logger, inboundMessage)
 
-const sendMessageToSingleFrontDoor = async (logger, appMessage) => {
-  validateInboundMessage(logger, appMessage)
+  const outboundMessage = buildOutboundMessage(uuidv4(), inboundMessage)
 
-  const messageId = generateMessageId()
-  const sfdMessage = buildSfdMessageFrom(messageId, appMessage)
+  const { success } = await sendMessageToSfd(logger, outboundMessage)
 
-  await storeMessages(logger, appMessage, sfdMessage)
+  await storeMessages(
+    logger,
+    inboundMessageQueueId,
+    inboundMessage,
+    outboundMessage,
+    success
+  )
 
-  await sendMessageToSfd(logger, sfdMessage)
-  return sfdMessage
+  return outboundMessage
 }
 
-const validateInboundMessage = (logger, appMessage) => {
-  const { error } = applicationMessageSchema.validate(appMessage, { abortEarly: false })
+const validateInboundMessage = (logger, inboundMessage) => {
+  const { error } = inboundMessageSchema.validate(inboundMessage, {
+    abortEarly: false
+  })
+
   if (error) {
-    logger.error(`The application message is invalid. ${error.message}`)
-    throw new Error(`The application message is invalid. ${error.message}`)
+    const errorMessage = `The inbound message is invalid. ${error.message}`
+    logAndThrowError(errorMessage, logger)
   }
 }
 
-const generateMessageId = () => {
-  return uuidv4()
-}
-
-const buildSfdMessageFrom = (messageId, appMessage) => {
-  let data
-  if (appMessage.sbi) {
-    data = { ...appMessage }
-  }
+const buildOutboundMessage = (messageId, inboundMessage) => {
+  const service = SOURCE_SYSTEM
 
   return {
     id: messageId,
-    agreementReference: appMessage.crn,
-    claimReference: 'fake-claim-1',
-    templateId: 'fake-template-1',
-    data
+    source: service,
+    specversion: '1.0.2',
+    type: 'uk.gov.ffc.ahwr.comms.request',
+    datacontenttype: 'application/json',
+    time: inboundMessage.dateTime.toString(),
+    data: {
+      crn: inboundMessage.crn,
+      sbi: inboundMessage.sbi,
+      sourceSystem: service,
+      notifyTemplateId: inboundMessage.notifyTemplateId,
+      commsType: 'email',
+      commsAddress: inboundMessage.emailAddress,
+      personalisation: inboundMessage.customParams,
+      reference: `${service}-${messageId}`
+    }
   }
 }
 
-const storeMessages = async (logger, appMessage, sfdMessage) => {
-  const { error } = messageLogSchema.validate(sfdMessage, { abortEarly: false })
-  if (error) {
-    logger.error(`The single front door message is invalid. ${error.message}`)
-    throw new Error(`The single front door message is invalid. ${error.message}`)
+const storeMessages = async (
+  logger,
+  inboundMessageQueueId,
+  inboundMessage,
+  outboundMessage,
+  outboundMessageSuccessful
+) => {
+  let databaseMessage = {
+    id: outboundMessage.id,
+    agreementReference: inboundMessage.agreementReference,
+    templateId: inboundMessage.notifyTemplateId,
+    data: {
+      inboundMessageQueueId,
+      inboundMessage,
+      outboundMessage
+    },
+    status: outboundMessageSuccessful
+      ? MESSAGE_RESULT_MAP.unknown
+      : MESSAGE_RESULT_MAP.unsent
+  }
+  if (inboundMessage.claimReference) {
+    databaseMessage = {
+      claimReference: inboundMessage.claimReference,
+      ...databaseMessage
+    }
   }
 
+  // this can't fail, valid inboundMessage schema validation prevents it
+  messageLogTableSchema.validate(databaseMessage, {
+    abortEarly: false
+  })
+
   try {
-    await set(logger, sfdMessage)
+    await set(logger, databaseMessage)
   } catch (error) {
-    logger.error(`Failed to save single front door message. ${error.message}`)
-    throw new Error(`Failed to save single front door message. ${error.message}`)
+    const errorMessage = `Failed to save single front door message. ${error.message}`
+    logAndThrowError(errorMessage, logger)
   }
 }
 
-const sendMessageToSfd = async (logger, sfdMessage) => {
+const sendMessageToSfd = async (logger, outboundMessage) => {
   try {
-    sendSfdMessageRequest(sfdMessage)
+    sendSfdMessageRequest(outboundMessage)
+    return { success: true }
   } catch (error) {
-    logger.error(`Failed to send message to single front door. ${error.message}`)
-    throw new Error(`Failed to send message to single front door. ${error.message}`)
+    logger.error(
+      `Failed to send outbound message to single front door. ${error.message}`
+    )
+    return { success: false }
   }
 }
 
 module.exports = {
-  sendMessageToSingleFrontDoor
+  sendMessageToSingleFrontDoor,
+  buildOutboundMessage
 }

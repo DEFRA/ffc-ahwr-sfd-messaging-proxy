@@ -3,7 +3,7 @@ const dbConfig = require('./db')
 const messageQueueConfig = require('./message-queue')
 
 const schema = Joi.object({
-  port: Joi.number().default(3005),
+  port: Joi.number(),
   env: Joi.string().valid('development', 'test', 'production').default('development'),
   isDev: Joi.boolean().default(false),
   termsAndConditionsUrl: Joi.string().default('#'),
