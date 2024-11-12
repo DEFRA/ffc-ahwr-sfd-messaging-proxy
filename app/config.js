@@ -1,5 +1,5 @@
-const convict = require('convict')
-const convictFormatWithValidator = require('convict-format-with-validator')
+import convict from 'convict'
+import convictFormatWithValidator from 'convict-format-with-validator'
 
 convict.addFormats(convictFormatWithValidator)
 
@@ -32,4 +32,4 @@ const config = convict({
 
 config.validate({ allowed: 'strict' })
 
-module.exports = config
+export default config

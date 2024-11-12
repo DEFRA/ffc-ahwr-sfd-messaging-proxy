@@ -1,34 +1,33 @@
-const { setup } = require('./insights.js')
-require('log-timestamp')
-const messaging = require('./messaging/index.js')
-const { createServer } = require('./server.js')
-
-let serverLogger
+import { setup } from './insights.js'
+import 'log-timestamp'
+import { startSfdMessageReceiver, stopSfdMessageReceiver } from './messaging/index.js'
+import server from './server.js'
 
 const init = async () => {
-  const server = await createServer()
+  setup()
+
+  await startSfdMessageReceiver(server.logger)
   await server.start()
-  serverLogger = server.logger
-  serverLogger.warn(`Server running on ${server.info.uri}`)
+
+  server.logger.info(`Server running on ${server.info.uri}`)
 }
 
-process.on('unhandledRejection', (err) => {
-  console.log(err)
+process.on('unhandledRejection', async (err) => {
+  await stopSfdMessageReceiver()
+  server.logger.error(err, 'unhandledRejection')
   process.exit(1)
 })
 
 process.on('SIGTERM', async () => {
-  await messaging.stop()
+  await stopSfdMessageReceiver()
+  server.logger.error('SIGTERM')
   process.exit(0)
 })
 
 process.on('SIGINT', async () => {
-  await messaging.stop()
+  await stopSfdMessageReceiver()
+  server.logger.error('SIGINT')
   process.exit(0)
 })
 
-module.exports = (async function startService () {
-  setup()
-  await init()
-  await messaging.start(serverLogger)
-}())
+init()

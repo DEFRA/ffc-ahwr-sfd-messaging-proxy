@@ -1,24 +1,17 @@
-const fs = require('fs')
-const path = require('path')
-const { Sequelize, DataTypes } = require('sequelize')
-const config = require('../config/db')
-const dbConfig = config[process.env.NODE_ENV]
-const modelPath = path.join(__dirname, 'models')
+import { Sequelize, DataTypes } from 'sequelize'
+import config from '../config/db.js'
+import messageLogFn from './models/message-log.js'
 
-module.exports = (() => {
+const dbConfig = config[process.env.NODE_ENV]
+
+export default (() => {
   const sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password, dbConfig)
 
-  fs
-    .readdirSync(modelPath)
-    .filter(file => {
-      return (file.indexOf('.') !== 0) && (file !== 'index.js') && (file.slice(-3) === '.js')
-    })
-    .forEach(file => require(path.join(modelPath, file))(sequelize, DataTypes))
+  // This needs to be done for each table we define in /models
+  const messageLog = messageLogFn(sequelize, DataTypes)
 
-  for (const model of Object.values(sequelize.models)) {
-    if (model.associate) {
-      model.associate(sequelize.models)
-    }
+  if (messageLog.associate) {
+    messageLog.associate(sequelize.models)
   }
 
   return {

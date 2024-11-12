@@ -1,16 +1,10 @@
-const { v4: uuidv4 } = require('uuid')
-const { set } = require('../repositories/message-log-repository')
-const {
-  sendSfdMessageRequest
-} = require('../messaging/forward-message-request-to-sfd')
-const { logAndThrowError } = require('../logging/index')
-const {
-  inboundMessageSchema,
-  messageLogTableSchema
-} = require('../schemas/index')
-const { SOURCE_SYSTEM, MESSAGE_RESULT_MAP } = require('../constants/index')
+import { set } from '../repositories/message-log-repository.js'
+import { v4 as uuidv4 } from 'uuid'
+import { sendSfdMessageRequest } from '../messaging/forward-message-request-to-sfd.js'
+import { inboundMessageSchema, messageLogTableSchema } from '../schemas/index.js'
+import { MESSAGE_RESULT_MAP, SOURCE_SYSTEM } from '../constants/index.js'
 
-const sendMessageToSingleFrontDoor = async (
+export const sendMessageToSingleFrontDoor = async (
   logger,
   inboundMessageQueueId,
   inboundMessage
@@ -39,11 +33,12 @@ const validateInboundMessage = (logger, inboundMessage) => {
 
   if (error) {
     const errorMessage = `The inbound message is invalid. ${error.message}`
-    logAndThrowError(errorMessage, logger)
+    logger.error(errorMessage)
+    throw new Error(errorMessage)
   }
 }
 
-const buildOutboundMessage = (messageId, inboundMessage) => {
+export const buildOutboundMessage = (messageId, inboundMessage) => {
   const service = SOURCE_SYSTEM
 
   return {
@@ -100,9 +95,11 @@ const storeMessages = async (
 
   try {
     await set(logger, databaseMessage)
+    logger.info('Successfully stored message to database.')
   } catch (error) {
     const errorMessage = `Failed to save single front door message. ${error.message}`
-    logAndThrowError(errorMessage, logger)
+    logger.error(errorMessage)
+    throw new Error(errorMessage)
   }
 }
 
@@ -116,9 +113,4 @@ const sendMessageToSfd = async (logger, outboundMessage) => {
     )
     return { success: false }
   }
-}
-
-module.exports = {
-  sendMessageToSingleFrontDoor,
-  buildOutboundMessage
 }

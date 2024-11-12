@@ -1,8 +1,7 @@
-const { createServer } = require('../../../../app/server.js')
+import server from '../../../../app/server.js'
 
 describe('Server test', () => {
   test('createServer returns server', async () => {
-    const server = await createServer()
     await server.initialize()
     expect(server).toBeDefined()
   })

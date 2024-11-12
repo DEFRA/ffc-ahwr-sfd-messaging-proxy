@@ -1,4 +1,6 @@
-const joi = require('joi')
+import joi from 'joi'
+import appInsights from 'applicationinsights'
+
 const msgTypePrefix = 'uk.gov.ffc.ahwr'
 
 const sharedConfigSchema = {
@@ -23,7 +25,7 @@ const schema = joi.object({
 })
 
 const sharedConfig = {
-  appInsights: require('applicationinsights'),
+  appInsights,
   host: process.env.MESSAGE_QUEUE_HOST,
   password: process.env.MESSAGE_QUEUE_PASSWORD,
   username: process.env.MESSAGE_QUEUE_USER,
@@ -49,4 +51,4 @@ if (error) {
   throw new Error(`The message queue config is invalid. ${error.message}`)
 }
 
-module.exports = value
+export default value

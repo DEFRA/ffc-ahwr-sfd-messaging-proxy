@@ -1,10 +1,7 @@
-const { models } = require('../data')
+import dataModeller from '../data/index.js'
 
-const set = async (logger, data) => {
+export const set = async (logger, data) => {
   logger.warn(`Creating message log with id: ${data.id}`)
+  const { models } = dataModeller
   return models.messageLog.create(data)
-}
-
-module.exports = {
-  set
 }

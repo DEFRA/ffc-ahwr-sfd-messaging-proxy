@@ -1,7 +1,8 @@
-const { MessageSender } = require('ffc-messaging')
-const { sfdMessageTopic, sfdMessageRequestMsgType } = require('../config/index').messageQueueConfig
+import { MessageSender } from 'ffc-messaging'
+import config from '../config/index.js'
 
-const sendSfdMessageRequest = async (sfdMessageRequest) => {
+export const sendSfdMessageRequest = async (sfdMessageRequest) => {
+  const { sfdMessageTopic, sfdMessageRequestMsgType } = config.messageQueueConfig
   const sender = new MessageSender(sfdMessageTopic)
   const message = createMessage(sfdMessageRequest, sfdMessageRequestMsgType)
 
@@ -16,8 +17,4 @@ const createMessage = (body, type) => {
     source: 'ffc-ahwr-sfd-messaging-proxy',
     options: {}
   }
-}
-
-module.exports = {
-  sendSfdMessageRequest
 }

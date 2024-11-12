@@ -1,28 +1,28 @@
-const Joi = require('joi')
-const dbConfig = require('./db')
-const messageQueueConfig = require('./message-queue')
+import joi from 'joi'
+import dbConfig from './db.js'
+import messageQueueConfig from './message-queue.js'
 
-const schema = Joi.object({
-  port: Joi.number(),
-  env: Joi.string().valid('development', 'test', 'production').default('development'),
-  isDev: Joi.boolean().default(false),
-  termsAndConditionsUrl: Joi.string().default('#'),
-  applyServiceUri: Joi.string().default('#'),
-  claimServiceUri: Joi.string().default('#'),
-  endemics: Joi.object({
-    enabled: Joi.boolean().default(false)
+const schema = joi.object({
+  port: joi.number(),
+  env: joi.string().valid('development', 'test', 'production').default('development'),
+  isDev: joi.boolean().default(false),
+  termsAndConditionsUrl: joi.string().default('#'),
+  applyServiceUri: joi.string().default('#'),
+  claimServiceUri: joi.string().default('#'),
+  endemics: joi.object({
+    enabled: joi.boolean().default(false)
   })
 })
 
 const config = {
-  port: process.env.PORT,
+  port: process.env.PORT ? Number(process.env.PORT) : undefined,
   env: process.env.NODE_ENV,
   isDev: process.env.NODE_ENV === 'development',
   termsAndConditionsUrl: process.env.TERMS_AND_CONDITIONS_URL,
   applyServiceUri: process.env.APPLY_SERVICE_URI,
   claimServiceUri: process.env.CLAIM_SERVICE_URI,
   endemics: {
-    enabled: process.env.ENDEMICS_ENABLED
+    enabled: process.env.ENDEMICS_ENABLED && process.env.ENDEMICS_ENABLED === 'true'
   }
 }
 
@@ -35,4 +35,4 @@ if (error) {
 value.dbConfig = dbConfig
 value.messageQueueConfig = messageQueueConfig
 
-module.exports = value
+export default value
