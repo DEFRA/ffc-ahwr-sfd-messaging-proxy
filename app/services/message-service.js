@@ -1,7 +1,10 @@
 import { set } from '../repositories/message-log-repository.js'
 import { v4 as uuidv4 } from 'uuid'
 import { sendSfdMessageRequest } from '../messaging/forward-message-request-to-sfd.js'
-import { inboundMessageSchema, messageLogTableSchema } from '../schemas/index.js'
+import {
+  inboundMessageSchema,
+  messageLogTableSchema
+} from '../schemas/index.js'
 import { MESSAGE_RESULT_MAP, SOURCE_SYSTEM } from '../constants/index.js'
 
 export const sendMessageToSingleFrontDoor = async (
@@ -68,7 +71,7 @@ const storeMessages = async (
   outboundMessage,
   outboundMessageSuccessful
 ) => {
-  let databaseMessage = {
+  const databaseMessage = {
     id: outboundMessage.id,
     agreementReference: inboundMessage.agreementReference,
     templateId: inboundMessage.notifyTemplateId,
@@ -79,16 +82,12 @@ const storeMessages = async (
     },
     status: outboundMessageSuccessful
       ? MESSAGE_RESULT_MAP.unknown
-      : MESSAGE_RESULT_MAP.unsent
-  }
-  if (inboundMessage.claimReference) {
-    databaseMessage = {
-      claimReference: inboundMessage.claimReference,
-      ...databaseMessage
-    }
+      : MESSAGE_RESULT_MAP.unsent,
+    ...(inboundMessage.claimReference
+      ? { claimReference: inboundMessage.claimReference }
+      : {})
   }
 
-  // this can't fail, valid inboundMessage schema validation prevents it
   messageLogTableSchema.validate(databaseMessage, {
     abortEarly: false
   })

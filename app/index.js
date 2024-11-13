@@ -4,7 +4,7 @@ import { startSfdMessageReceiver, stopSfdMessageReceiver } from './messaging/ind
 import server from './server.js'
 
 const init = async () => {
-  setup()
+  setup(server.logger)
 
   await startSfdMessageReceiver(server.logger)
   await server.start()

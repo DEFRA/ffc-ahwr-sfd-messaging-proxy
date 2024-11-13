@@ -1,4 +1,4 @@
-import { sendSfdMessageRequest } from '../../../../../app/messaging/forward-message-request-to-sfd'
+import { sendSfdMessageRequest } from '../../../../app/messaging/forward-message-request-to-sfd'
 
 const mockSendMessage = jest.fn()
 const mockCloseConnection = jest.fn()
@@ -41,10 +41,22 @@ describe('sendSfdMessageRequest', () => {
   })
 
   test('it sends a message to SFD', async () => {
-    console.log('in')
     await sendSfdMessageRequest(outboundMessage)
 
-    expect(mockSendMessage).toHaveBeenCalledWith('')
+    expect(mockSendMessage).toHaveBeenCalledWith({
+      body: {
+        data: outboundMessage.data,
+        datacontenttype: outboundMessage.datacontenttype,
+        id: outboundMessage.id,
+        source: outboundMessage.source,
+        specversion: outboundMessage.specversion,
+        time: outboundMessage.time,
+        type: outboundMessage.type
+      },
+      options: {},
+      source: 'ffc-ahwr-sfd-messaging-proxy',
+      type: 'uk.gov.ffc.ahwr.submit.sfd.message.request'
+    })
     expect(mockCloseConnection).toHaveBeenCalledTimes(1)
   })
 })

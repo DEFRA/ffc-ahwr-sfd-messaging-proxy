@@ -25,7 +25,7 @@ describe('App config', () => {
     process.env.CLAIM_SERVICE_URI = testData.claimServiceUri
     process.env.ENDEMICS_ENABLED = testData.endemicsEnabled
 
-    const config = jest.requireActual('../../../../../app/config/index.js')
+    const config = jest.requireActual('../../../../app/config/index.js')
 
     expect(config.default).toEqual({
       messageQueueConfig: expect.any(Object), // These 2 pieces of config are pulled in from other files, so we dont want to test them here
