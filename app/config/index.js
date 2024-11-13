@@ -8,31 +8,22 @@ const schema = joi.object({
   isDev: joi.boolean().default(false),
   termsAndConditionsUrl: joi.string().default('#'),
   applyServiceUri: joi.string().default('#'),
-  claimServiceUri: joi.string().default('#'),
-  endemics: joi.object({
-    enabled: joi.boolean().default(false)
-  })
+  claimServiceUri: joi.string().default('#')
 })
 
-const config = {
+const baseConfig = {
   port: process.env.PORT ? Number(process.env.PORT) : undefined,
   env: process.env.NODE_ENV,
   isDev: process.env.NODE_ENV === 'development',
   termsAndConditionsUrl: process.env.TERMS_AND_CONDITIONS_URL,
   applyServiceUri: process.env.APPLY_SERVICE_URI,
-  claimServiceUri: process.env.CLAIM_SERVICE_URI,
-  endemics: {
-    enabled: process.env.ENDEMICS_ENABLED && process.env.ENDEMICS_ENABLED === 'true'
-  }
+  claimServiceUri: process.env.CLAIM_SERVICE_URI
 }
 
-const { error, value } = schema.validate(config, { abortEarly: false })
+const { error } = schema.validate(baseConfig, { abortEarly: false })
 
 if (error) {
   throw new Error(`The server config is invalid. ${error.message}`)
 }
 
-value.dbConfig = dbConfig
-value.messageQueueConfig = messageQueueConfig
-
-export default value
+export const config = { ...baseConfig, dbConfig, messageQueueConfig }

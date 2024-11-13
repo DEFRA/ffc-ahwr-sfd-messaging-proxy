@@ -1,5 +1,5 @@
 import { MessageSender } from 'ffc-messaging'
-import config from '../config/index.js'
+import { config } from '../config/index.js'
 
 export const sendSfdMessageRequest = async (sfdMessageRequest) => {
   const { sfdMessageTopic, sfdMessageRequestMsgType } = config.messageQueueConfig
