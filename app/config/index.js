@@ -1,6 +1,6 @@
 import joi from 'joi'
 import { config as dbConfig } from './db.js'
-import messageQueueConfig from './message-queue.js'
+import { config as messageQueueConfig } from './message-queue.js'
 
 const schema = joi.object({
   port: joi.number(),

@@ -32,7 +32,7 @@ const sharedConfig = {
   useCredentialChain: process.env.NODE_ENV === 'production'
 }
 
-const config = {
+const combinedConfig = {
   sfdMessageRequestQueue: {
     address: process.env.SFDMESSAGEREQUEST_QUEUE_ADDRESS,
     type: 'queue',
@@ -45,10 +45,10 @@ const config = {
   sfdMessageRequestMsgType: `${msgTypePrefix}.submit.sfd.message.request`
 }
 
-const { error, value } = schema.validate(config, { abortEarly: false })
+const { error } = schema.validate(combinedConfig, { abortEarly: false })
 
 if (error) {
   throw new Error(`The message queue config is invalid. ${error.message}`)
 }
 
-export default value
+export const config = combinedConfig
