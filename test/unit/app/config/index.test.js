@@ -19,7 +19,7 @@ describe('App config', () => {
     process.env.PORT = testData.port
     process.env.NODE_ENV = testData.nodeEnv
 
-    const { config } = require('../../../../app/config/index.js')
+    const { config } = require('../../../../app/config/index.js') // This style of dynamic import is needed to get the process.env setting to work properly
 
     expect(config).toEqual({
       messageQueueConfig: expect.any(Object), // This...

@@ -39,4 +39,4 @@ const dbConfig = {
   username: process.env.POSTGRES_USERNAME
 }
 
-export default { development: dbConfig, production: dbConfig, test: dbConfig }
+export const config = { development: dbConfig, production: dbConfig, test: dbConfig }

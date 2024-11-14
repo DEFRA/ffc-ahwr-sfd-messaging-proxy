@@ -1,5 +1,5 @@
 import { MessageReceiver } from 'ffc-messaging'
-import config from '../config/index.js'
+import { config } from '../config/index.js'
 import { processMessageRequest } from './process-message-request.js'
 
 let sfdMessageReceiver

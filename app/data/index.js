@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes } from 'sequelize'
-import config from '../config/db.js'
+import { config } from '../config/db.js'
 import messageLogFn from './models/message-log.js'
 
 const dbConfig = config[process.env.NODE_ENV]

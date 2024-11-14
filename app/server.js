@@ -1,6 +1,6 @@
 import hapi from '@hapi/hapi'
 import joi from 'joi'
-import config from './config.js'
+import { config } from './config.js'
 import { healthRoutes } from './routes/health.js'
 import logger from './logger.js'
 
