@@ -1,6 +1,6 @@
 import joi from 'joi'
 
-const crn = joi.number().min(1050000000).max(9999999999).required()
+const crn = joi.number().min(1050000000).max(9999999999)
 const sbi = joi.number().min(105000000).max(999999999).required()
 const email = joi.string()
   .pattern(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/)

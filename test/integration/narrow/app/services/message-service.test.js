@@ -59,9 +59,9 @@ describe('sendMessageToSingleFrontDoor', () => {
         inboundMessageQueueId,
         emptyInboundMessage
       )
-    ).rejects.toThrow('The inbound message is invalid. "crn" is required')
+    ).rejects.toThrow('The inbound message is invalid. "sbi" is required')
     expect(mockedLogger.error).toHaveBeenCalledWith(
-      'The inbound message is invalid. "crn" is required. "sbi" is required. "agreementReference" is required. "notifyTemplateId" is required. "customParams" is required. "dateTime" is required'
+      'The inbound message is invalid. "sbi" is required. "agreementReference" is required. "notifyTemplateId" is required. "customParams" is required. "dateTime" is required'
     )
   })
 
