@@ -1,6 +1,5 @@
 import hapi from '@hapi/hapi'
 import joi from 'joi'
-import blipp from 'blipp'
 import config from './config.js'
 import { healthRoutes } from './routes/health.js'
 import logger from './logger.js'
@@ -25,10 +24,6 @@ server.validator(joi)
 server.route([...healthRoutes])
 
 const plugins = [logger]
-
-if (config.get('isDev')) {
-  plugins.push(blipp)
-}
 
 server.register(plugins)
 
