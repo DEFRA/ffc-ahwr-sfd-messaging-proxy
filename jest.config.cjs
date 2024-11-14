@@ -13,7 +13,11 @@ module.exports = {
     '<rootDir>/node_modules/',
     '<rootDir>/test-output/',
     '<rootDir>/test/',
-    '<rootDir>/jest.config.js'
+    '<rootDir>/jest.config.js',
+    '<rootDir>/app/data',
+    '<rootDir>/app/index.js',
+    '<rootDir>/app/messaging/index.js',
+    '<rootDir>/app/config/db.js'
   ],
   modulePathIgnorePatterns: [
     'node_modules'
@@ -31,11 +35,10 @@ module.exports = {
     ]
   ],
   testEnvironment: 'node',
+  transform: {
+    '^.+\\.[t|j]sx?$': 'babel-jest'
+  },
   testPathIgnorePatterns: [],
   verbose: false,
-  setupFilesAfterEnv: [
-    '<rootDir>/test/setup.js',
-    '<rootDir>/test/teardown.js'
-  ],
   workerIdleMemoryLimit: '500MB'
 }

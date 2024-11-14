@@ -1,7 +1,7 @@
-const { validateMessageRequest } = require('./message-request-schema')
-const { sendMessageToSingleFrontDoor } = require('../services/message-service')
+import { sendMessageToSingleFrontDoor } from '../services/message-service.js'
+import { validateMessageRequest } from './message-request-schema.js'
 
-const processMessageRequest = async (logger, message, receiver) => {
+export const processMessageRequest = async (logger, message, receiver) => {
   try {
     logger.warn(`Received sfd message request with id: ${message.messageId}`)
     const messageBody = message.body
@@ -14,5 +14,3 @@ const processMessageRequest = async (logger, message, receiver) => {
     logger.error(`Unable to process sfd message request: ${err.message}`)
   }
 }
-
-module.exports = processMessageRequest

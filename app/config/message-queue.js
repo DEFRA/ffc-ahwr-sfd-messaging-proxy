@@ -1,4 +1,6 @@
-const joi = require('joi')
+import joi from 'joi'
+import appInsights from 'applicationinsights'
+
 const msgTypePrefix = 'uk.gov.ffc.ahwr'
 
 const sharedConfigSchema = {
@@ -23,14 +25,14 @@ const schema = joi.object({
 })
 
 const sharedConfig = {
-  appInsights: require('applicationinsights'),
+  appInsights,
   host: process.env.MESSAGE_QUEUE_HOST,
   password: process.env.MESSAGE_QUEUE_PASSWORD,
   username: process.env.MESSAGE_QUEUE_USER,
   useCredentialChain: process.env.NODE_ENV === 'production'
 }
 
-const config = {
+const combinedConfig = {
   sfdMessageRequestQueue: {
     address: process.env.SFDMESSAGEREQUEST_QUEUE_ADDRESS,
     type: 'queue',
@@ -43,10 +45,10 @@ const config = {
   sfdMessageRequestMsgType: `${msgTypePrefix}.submit.sfd.message.request`
 }
 
-const { error, value } = schema.validate(config, { abortEarly: false })
+const { error } = schema.validate(combinedConfig, { abortEarly: false })
 
 if (error) {
   throw new Error(`The message queue config is invalid. ${error.message}`)
 }
 
-module.exports = value
+export const config = combinedConfig

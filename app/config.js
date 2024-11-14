@@ -1,9 +1,9 @@
-const convict = require('convict')
-const convictFormatWithValidator = require('convict-format-with-validator')
+import convict from 'convict'
+import convictFormatWithValidator from 'convict-format-with-validator'
 
 convict.addFormats(convictFormatWithValidator)
 
-const config = convict({
+const unvalidatedConfig = convict({
   env: {
     doc: 'The application environment.',
     format: ['production', 'development', 'test'],
@@ -30,6 +30,4 @@ const config = convict({
   }
 })
 
-config.validate({ allowed: 'strict' })
-
-module.exports = config
+export const config = unvalidatedConfig.validate({ allowed: 'strict' })

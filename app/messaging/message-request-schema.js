@@ -1,6 +1,6 @@
-const { inboundMessageSchema } = require('../schemas/index')
+import { inboundMessageSchema } from '../schemas/index.js'
 
-const validateMessageRequest = (logger, event) => {
+export const validateMessageRequest = (logger, event) => {
   const validate = inboundMessageSchema.validate(event)
   if (validate.error) {
     logger.error(
@@ -9,8 +9,4 @@ const validateMessageRequest = (logger, event) => {
     return false
   }
   return true
-}
-
-module.exports = {
-  validateMessageRequest
 }

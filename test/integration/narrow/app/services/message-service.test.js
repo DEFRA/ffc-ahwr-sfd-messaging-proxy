@@ -1,8 +1,18 @@
-const { v4: uuidv4 } = require('uuid')
-const {
+import { v4 as uuidv4 } from 'uuid'
+import {
   sendMessageToSingleFrontDoor,
   buildOutboundMessage
-} = require('../../../../../app/services/message-service')
+} from '../../../../../app/services/message-service'
+import { set } from '../../../../../app/repositories/message-log-repository'
+import { sendSfdMessageRequest } from '../../../../../app/messaging/forward-message-request-to-sfd'
+
+jest.mock('../../../../../app/repositories/message-log-repository', () => ({
+  set: jest.fn()
+}))
+
+jest.mock('../../../../../app/messaging/forward-message-request-to-sfd', () => ({
+  sendSfdMessageRequest: jest.fn()
+}))
 
 const now = new Date().toISOString()
 
@@ -27,7 +37,8 @@ describe('sendMessageToSingleFrontDoor', () => {
 
     mockedLogger = jest.fn(() => ({
       warn: jest.fn(),
-      error: jest.fn()
+      error: jest.fn(),
+      info: jest.fn()
     }))()
   })
 
@@ -55,9 +66,6 @@ describe('sendMessageToSingleFrontDoor', () => {
   })
 
   test('throws an error when fail to store message log database item', async () => {
-    const {
-      set
-    } = require('../../../../../app/repositories/message-log-repository')
     set.mockImplementation(() => {
       throw new Error('Faked data persistence error')
     })
@@ -77,16 +85,10 @@ describe('sendMessageToSingleFrontDoor', () => {
   })
 
   test('stores that the message was not sent, if the SFD request fails', async () => {
-    const {
-      sendSfdMessageRequest
-    } = require('../../../../../app/messaging/forward-message-request-to-sfd')
     sendSfdMessageRequest.mockImplementation(() => {
       throw new Error('Faked message send error')
     })
 
-    const {
-      set
-    } = require('../../../../../app/repositories/message-log-repository')
     set.mockImplementation(jest.fn())
 
     await sendMessageToSingleFrontDoor(
@@ -95,47 +97,90 @@ describe('sendMessageToSingleFrontDoor', () => {
       validInboundMessage
     )
 
-    expect(set).toHaveBeenCalledWith(
-      { error: expect.any(Function), warn: expect.any(Function) },
-      {
-        agreementReference: 'IAHW-ABC1-5899',
-        claimReference: 'RESH-F99F-E09F',
-        data: {
-          inboundMessage: {
-            agreementReference: 'IAHW-ABC1-5899',
-            claimReference: 'RESH-F99F-E09F',
-            crn: 1234567890,
-            customParams: {},
-            dateTime: now,
-            emailAddress: 'an@email.com',
-            notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d99',
-            sbi: 123456789
-          },
-          inboundMessageQueueId: '298293c75b734f2195c9d1478ccb3dca',
-          outboundMessage: {
-            data: {
-              commsAddress: 'an@email.com',
-              commsType: 'email',
-              crn: 1234567890,
-              notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d99',
-              personalisation: {},
-              reference: expect.any(String),
-              sbi: 123456789,
-              sourceSystem: 'ffc-ahwr'
-            },
-            datacontenttype: 'application/json',
-            id: expect.any(String),
-            source: 'ffc-ahwr',
-            specversion: '1.0.2',
-            time: now,
-            type: 'uk.gov.ffc.ahwr.comms.request'
-          }
+    expect(set).toHaveBeenCalledWith(mockedLogger, {
+      agreementReference: 'IAHW-ABC1-5899',
+      claimReference: 'RESH-F99F-E09F',
+      data: {
+        inboundMessage: {
+          agreementReference: 'IAHW-ABC1-5899',
+          claimReference: 'RESH-F99F-E09F',
+          crn: 1234567890,
+          customParams: {},
+          dateTime: now,
+          emailAddress: 'an@email.com',
+          notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d99',
+          sbi: 123456789
         },
-        id: expect.any(String),
-        status: 'UNSENT', // <-------- This is the important bit!
-        templateId: '123456fc-9999-40c1-a11d-85f55aff4d99'
-      }
-    )
+        inboundMessageQueueId: '298293c75b734f2195c9d1478ccb3dca',
+        outboundMessage: {
+          data: {
+            commsAddress: 'an@email.com',
+            commsType: 'email',
+            crn: 1234567890,
+            notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d99',
+            personalisation: {},
+            reference: expect.any(String),
+            sbi: 123456789,
+            sourceSystem: 'ffc-ahwr'
+          },
+          datacontenttype: 'application/json',
+          id: expect.any(String),
+          source: 'ffc-ahwr',
+          specversion: '1.0.2',
+          time: now,
+          type: 'uk.gov.ffc.ahwr.comms.request'
+        }
+      },
+      id: expect.any(String),
+      status: 'UNSENT', // <-------- This is the important bit!
+      templateId: '123456fc-9999-40c1-a11d-85f55aff4d99'
+    })
+  })
+
+  test('stores the message with no claim reference if it does not exist on the inbound message, and a status of UNKNOWN if the sfd message was sent ok', async () => {
+    set.mockImplementation(jest.fn())
+
+    await sendMessageToSingleFrontDoor(mockedLogger, inboundMessageQueueId, {
+      ...validInboundMessage,
+      claimReference: undefined
+    })
+
+    expect(set).toHaveBeenCalledWith(mockedLogger, {
+      agreementReference: 'IAHW-ABC1-5899',
+      data: {
+        inboundMessage: {
+          agreementReference: 'IAHW-ABC1-5899',
+          crn: 1234567890,
+          customParams: {},
+          dateTime: now,
+          emailAddress: 'an@email.com',
+          notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d99',
+          sbi: 123456789
+        },
+        inboundMessageQueueId: '298293c75b734f2195c9d1478ccb3dca',
+        outboundMessage: {
+          data: {
+            commsAddress: 'an@email.com',
+            commsType: 'email',
+            crn: 1234567890,
+            notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d99',
+            personalisation: {},
+            reference: expect.any(String),
+            sbi: 123456789,
+            sourceSystem: 'ffc-ahwr'
+          },
+          datacontenttype: 'application/json',
+          id: expect.any(String),
+          source: 'ffc-ahwr',
+          specversion: '1.0.2',
+          time: now,
+          type: 'uk.gov.ffc.ahwr.comms.request'
+        }
+      },
+      id: expect.any(String),
+      status: 'UNKNOWN', // <-------- This is the important bit!
+      templateId: '123456fc-9999-40c1-a11d-85f55aff4d99'
+    })
   })
 })
 
@@ -172,7 +217,9 @@ describe('buildOutboundMessage', () => {
       }
     }
 
-    expect(buildOutboundMessage(messageId, inputApplyExisting)).toStrictEqual(expectedOutput)
+    expect(buildOutboundMessage(messageId, inputApplyExisting)).toStrictEqual(
+      expectedOutput
+    )
   })
 
   test('verify input and output for: Farmer Apply - confirm new user V3.0', async () => {
@@ -207,7 +254,9 @@ describe('buildOutboundMessage', () => {
       }
     }
 
-    expect(buildOutboundMessage(messageId, inputApplyNew)).toStrictEqual(expectedOutput)
+    expect(buildOutboundMessage(messageId, inputApplyNew)).toStrictEqual(
+      expectedOutput
+    )
   })
 
   test('verify input and output for: Farmer Claim - Complete', async () => {
@@ -243,7 +292,9 @@ describe('buildOutboundMessage', () => {
       }
     }
 
-    expect(buildOutboundMessage(messageId, inputClaimOldWorld)).toStrictEqual(expectedOutput)
+    expect(buildOutboundMessage(messageId, inputClaimOldWorld)).toStrictEqual(
+      expectedOutput
+    )
   })
 
   test('verify input and output for: Farmer Claim - Endemics Follow-up', async () => {
@@ -285,7 +336,9 @@ describe('buildOutboundMessage', () => {
       }
     }
 
-    expect(buildOutboundMessage(messageId, inputClaimEndemicFollowup)).toStrictEqual(expectedOutput)
+    expect(
+      buildOutboundMessage(messageId, inputClaimEndemicFollowup)
+    ).toStrictEqual(expectedOutput)
   })
 
   test('verify input and output for: Farmer Claim - Endemics Review', async () => {
@@ -327,6 +380,8 @@ describe('buildOutboundMessage', () => {
       }
     }
 
-    expect(buildOutboundMessage(messageId, inputClaimEndemicFollowup)).toStrictEqual(expectedOutput)
+    expect(
+      buildOutboundMessage(messageId, inputClaimEndemicFollowup)
+    ).toStrictEqual(expectedOutput)
   })
 })

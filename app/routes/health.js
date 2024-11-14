@@ -1,4 +1,4 @@
-const routes = [{
+export const healthRoutes = [{
   method: 'GET',
   path: '/healthy',
   handler: (request, h) => {
@@ -11,5 +11,3 @@ const routes = [{
     return h.response('ok')
   }
 }]
-
-module.exports = routes

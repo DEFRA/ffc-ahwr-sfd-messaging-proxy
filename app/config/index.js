@@ -1,38 +1,23 @@
-const Joi = require('joi')
-const dbConfig = require('./db')
-const messageQueueConfig = require('./message-queue')
+import joi from 'joi'
+import { config as dbConfig } from './db.js'
+import { config as messageQueueConfig } from './message-queue.js'
 
-const schema = Joi.object({
-  port: Joi.number(),
-  env: Joi.string().valid('development', 'test', 'production').default('development'),
-  isDev: Joi.boolean().default(false),
-  termsAndConditionsUrl: Joi.string().default('#'),
-  applyServiceUri: Joi.string().default('#'),
-  claimServiceUri: Joi.string().default('#'),
-  endemics: Joi.object({
-    enabled: Joi.boolean().default(false)
-  })
+const schema = joi.object({
+  port: joi.number(),
+  env: joi.string().valid('development', 'test', 'production').default('development'),
+  isDev: joi.boolean().default(false)
 })
 
-const config = {
-  port: process.env.PORT,
+const baseConfig = {
+  port: process.env.PORT ? Number(process.env.PORT) : undefined,
   env: process.env.NODE_ENV,
-  isDev: process.env.NODE_ENV === 'development',
-  termsAndConditionsUrl: process.env.TERMS_AND_CONDITIONS_URL,
-  applyServiceUri: process.env.APPLY_SERVICE_URI,
-  claimServiceUri: process.env.CLAIM_SERVICE_URI,
-  endemics: {
-    enabled: process.env.ENDEMICS_ENABLED
-  }
+  isDev: process.env.NODE_ENV === 'development'
 }
 
-const { error, value } = schema.validate(config, { abortEarly: false })
+const { error } = schema.validate(baseConfig, { abortEarly: false })
 
 if (error) {
   throw new Error(`The server config is invalid. ${error.message}`)
 }
 
-value.dbConfig = dbConfig
-value.messageQueueConfig = messageQueueConfig
-
-module.exports = value
+export const config = { ...baseConfig, dbConfig, messageQueueConfig }
