@@ -17,4 +17,4 @@ services:
       - ./babel.config.cjs:/home/node/babel.config.cjs
       - ./jsconfig.json:/home/node/jsconfig.json
     environment:
-      NODE_OPTIONS: "$NODE_OPTIONS --experimental-vm-modules"
+      NODE_OPTIONS: "$NODE_OPTIONS"
