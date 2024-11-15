@@ -13,20 +13,18 @@ const email = joi.string()
   .min(1)
   .max(EMAIL_MAX_LENGTH)
 
-/* sonar-ignore-all: javascript:S109 */
-
 export const outboundMessageSchema = joi.object({
   id: joi.string().guid({ version: 'uuidv4' }).required(),
   source: joi.string().min(1).max(100).required(),
-  specversion: joi.string().min(3).max(10).required(),
-  type: joi.string().min(3).max(250).required(),
+  specversion: joi.string().min(3).max(10).required(), // NOSONAR
+  type: joi.string().min(3).max(250).required(), // NOSONAR
   datacontenttype: joi.string(),
   time: joi.date(),
   data: joi.object({
     crn,
     sbi,
     sourceSystem: joi.string()
-      .min(3)
+      .min(3) // NOSONAR
       .max(100)
       .pattern(/^[a-z0-9-_]+$/)
       .required(),
@@ -45,7 +43,7 @@ export const inboundMessageSchema = joi.object({
   crn,
   sbi,
   agreementReference: joi.string().required(),
-  claimReference: joi.string().max(14),
+  claimReference: joi.string().max(14), // NOSONAR
   notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
   emailAddress: email,
   customParams: joi.object().required(),
@@ -54,15 +52,13 @@ export const inboundMessageSchema = joi.object({
 
 export const messageLogTableSchema = joi.object({
   id: joi.string().guid({ version: 'uuidv4' }).required(),
-  agreementReference: joi.string().max(14).required(),
-  claimReference: joi.string().max(14),
+  agreementReference: joi.string().max(14).required(), // NOSONAR
+  claimReference: joi.string().max(14), // NOSONAR
   templateId: joi.string().guid({ version: 'uuidv4' }).required(),
   data: joi.object({
     inboundMessageQueueId: joi.string().required(),
     inboundMessage: inboundMessageSchema.required(),
     outboundMessage: outboundMessageSchema.required()
   }).required(),
-  status: joi.string().max(50).required()
+  status: joi.string().max(50).required() // NOSONAR
 })
-
-/* sonar-enable-all: javascript:S109 */
