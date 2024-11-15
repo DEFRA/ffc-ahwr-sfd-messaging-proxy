@@ -14,6 +14,7 @@ const email = joi.string()
   .max(EMAIL_MAX_LENGTH)
 
 /* sonar-ignore-all: javascript:S109 */
+
 export const outboundMessageSchema = joi.object({
   id: joi.string().guid({ version: 'uuidv4' }).required(),
   source: joi.string().min(1).max(100).required(),
@@ -40,7 +41,6 @@ export const outboundMessageSchema = joi.object({
     .required()
 })
 
-/* sonar-ignore-all: javascript:S109 */
 export const inboundMessageSchema = joi.object({
   crn,
   sbi,
@@ -52,7 +52,6 @@ export const inboundMessageSchema = joi.object({
   dateTime: joi.date().required()
 })
 
-/* sonar-ignore-all: javascript:S109 */
 export const messageLogTableSchema = joi.object({
   id: joi.string().guid({ version: 'uuidv4' }).required(),
   agreementReference: joi.string().max(14).required(),
@@ -65,3 +64,5 @@ export const messageLogTableSchema = joi.object({
   }).required(),
   status: joi.string().max(50).required()
 })
+
+/* sonar-enable-all: javascript:S109 */
