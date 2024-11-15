@@ -1,24 +1,30 @@
 import joi from 'joi'
 
-const crn = joi.number().min(1050000000).max(9999999999)
-const sbi = joi.number().min(105000000).max(999999999).required()
+const CRN_MIN_VALUE = 1050000000
+const CRN_MAX_VALUE = 9999999999
+const SBI_MIN_VALUE = 105000000
+const SBI_MAX_VALUE = 999999999
+const EMAIL_MAX_LENGTH = 320
+
+const crn = joi.number().min(CRN_MIN_VALUE).max(CRN_MAX_VALUE)
+const sbi = joi.number().min(SBI_MIN_VALUE).max(SBI_MAX_VALUE).required()
 const email = joi.string()
   .pattern(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/)
   .min(1)
-  .max(320)
+  .max(EMAIL_MAX_LENGTH)
 
 export const outboundMessageSchema = joi.object({
   id: joi.string().guid({ version: 'uuidv4' }).required(),
   source: joi.string().min(1).max(100).required(),
-  specversion: joi.string().min(3).max(10).required(),
-  type: joi.string().min(3).max(250).required(),
+  specversion: joi.string().min(3).max(10).required(), // NOSONAR
+  type: joi.string().min(3).max(250).required(), // NOSONAR
   datacontenttype: joi.string(),
   time: joi.date(),
   data: joi.object({
     crn,
     sbi,
     sourceSystem: joi.string()
-      .min(3)
+      .min(3) // NOSONAR
       .max(100)
       .pattern(/^[a-z0-9-_]+$/)
       .required(),
@@ -37,7 +43,7 @@ export const inboundMessageSchema = joi.object({
   crn,
   sbi,
   agreementReference: joi.string().required(),
-  claimReference: joi.string().max(14),
+  claimReference: joi.string().max(14), // NOSONAR
   notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
   emailAddress: email,
   customParams: joi.object().required(),
@@ -46,13 +52,13 @@ export const inboundMessageSchema = joi.object({
 
 export const messageLogTableSchema = joi.object({
   id: joi.string().guid({ version: 'uuidv4' }).required(),
-  agreementReference: joi.string().max(14).required(),
-  claimReference: joi.string().max(14),
+  agreementReference: joi.string().max(14).required(), // NOSONAR
+  claimReference: joi.string().max(14), // NOSONAR
   templateId: joi.string().guid({ version: 'uuidv4' }).required(),
   data: joi.object({
     inboundMessageQueueId: joi.string().required(),
     inboundMessage: inboundMessageSchema.required(),
     outboundMessage: outboundMessageSchema.required()
   }).required(),
-  status: joi.string().max(50).required()
+  status: joi.string().max(50).required() // NOSONAR
 })

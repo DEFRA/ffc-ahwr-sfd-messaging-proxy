@@ -104,7 +104,7 @@ const storeMessages = async (
 
 const sendMessageToSfd = async (logger, outboundMessage) => {
   try {
-    sendSfdMessageRequest(outboundMessage)
+    await sendSfdMessageRequest(outboundMessage)
     return { success: true }
   } catch (error) {
     logger.error(
