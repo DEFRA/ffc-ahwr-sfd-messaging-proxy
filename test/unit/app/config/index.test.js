@@ -35,9 +35,7 @@ describe('App config', () => {
     process.env.NODE_ENV = 'foo'
 
     expect(() => {
-      console.log('before')
       require('../../../../app/config/index.js')
-      console.log('after')
     }).toThrowError('The server config is invalid. "env" must be one of [development, test, production]')
   })
 })
