@@ -13,8 +13,8 @@ export default (sequelize, DataTypes) => {
     templateId: DataTypes.STRING,
     data: DataTypes.JSONB,
     status: { type: DataTypes.STRING, defaultValue: MESSAGE_RESULT_MAP.unknown },
-    createdAt: { type: DataTypes.DATE, defaultValue: Date.now() },
-    updatedAt: { type: DataTypes.DATE, defaultValue: null }
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
     freezeTableName: true,
     tableName: 'message_log'
