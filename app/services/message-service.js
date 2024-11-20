@@ -1,10 +1,7 @@
 import { set } from '../repositories/message-log-repository.js'
 import { v4 as uuidv4 } from 'uuid'
 import { sendSfdMessageRequest } from '../messaging/forward-message-request-to-sfd.js'
-import {
-  inboundMessageSchema,
-  messageLogTableSchema
-} from '../schemas/index.js'
+import { messageLogTableSchema } from '../schemas/index.js'
 import { MESSAGE_RESULT_MAP, SOURCE_SYSTEM } from '../constants/index.js'
 
 export const sendMessageToSingleFrontDoor = async (
@@ -12,8 +9,6 @@ export const sendMessageToSingleFrontDoor = async (
   inboundMessageQueueId,
   inboundMessage
 ) => {
-  validateInboundMessage(logger, inboundMessage)
-
   const outboundMessage = buildOutboundMessage(uuidv4(), inboundMessage)
 
   const { success } = await sendMessageToSfd(logger, outboundMessage)
@@ -26,19 +21,11 @@ export const sendMessageToSingleFrontDoor = async (
     success
   )
 
-  return outboundMessage
-}
-
-const validateInboundMessage = (logger, inboundMessage) => {
-  const { error } = inboundMessageSchema.validate(inboundMessage, {
-    abortEarly: false
-  })
-
-  if (error) {
-    const errorMessage = `The inbound message is invalid. ${error.message}`
-    logger.error(errorMessage)
-    throw new Error(errorMessage)
+  if (!success) {
+    throw Error('Failed to send outbound message to SFD')
   }
+
+  return outboundMessage
 }
 
 export const buildOutboundMessage = (messageId, inboundMessage) => {
@@ -61,6 +48,16 @@ export const buildOutboundMessage = (messageId, inboundMessage) => {
       personalisation: inboundMessage.customParams,
       reference: `${service}-${messageId}`
     }
+  }
+}
+
+const sendMessageToSfd = async (logger, outboundMessage) => {
+  try {
+    await sendSfdMessageRequest(outboundMessage)
+    return { success: true }
+  } catch (error) {
+    logger.error({ err: error }, 'Failed to send outbound message to SFD')
+    return { success: false }
   }
 }
 
@@ -96,20 +93,8 @@ const storeMessages = async (
     await set(logger, databaseMessage)
     logger.info('Successfully stored message to database.')
   } catch (error) {
-    const errorMessage = `Failed to save single front door message. ${error.message}`
+    const errorMessage = `Failed to save message log. ${error.message}`
     logger.error(errorMessage)
     throw new Error(errorMessage)
-  }
-}
-
-const sendMessageToSfd = async (logger, outboundMessage) => {
-  try {
-    await sendSfdMessageRequest(outboundMessage)
-    return { success: true }
-  } catch (error) {
-    logger.error(
-      `Failed to send outbound message to single front door. ${error.message}`
-    )
-    return { success: false }
   }
 }
