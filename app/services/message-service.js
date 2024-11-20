@@ -9,8 +9,6 @@ export const sendMessageToSingleFrontDoor = async (
   inboundMessageQueueId,
   inboundMessage
 ) => {
-  // inboundMessage validated prior to this
-
   const outboundMessage = buildOutboundMessage(uuidv4(), inboundMessage)
 
   const { success } = await sendMessageToSfd(logger, outboundMessage)
@@ -58,7 +56,7 @@ const sendMessageToSfd = async (logger, outboundMessage) => {
     await sendSfdMessageRequest(outboundMessage)
     return { success: true }
   } catch (error) {
-    logger.error(`Failed to send outbound message to single front door. ${error.message}`)
+    logger.error({ err: error }, 'Failed to send outbound message to single front door')
     return { success: false }
   }
 }
