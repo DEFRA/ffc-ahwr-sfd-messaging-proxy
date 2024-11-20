@@ -46,13 +46,13 @@ describe('processMessageRequest', () => {
     }
     await processMessageRequest(mockedLogger, event, mockMessageReceiver)
 
-    expect(mockDeadLetterMessage).toHaveBeenCalledTimes(0)
-    expect(mockErrorLogger).toHaveBeenCalledTimes(0)
     expect(sendMessageToSingleFrontDoor).toHaveBeenCalledWith(mockedLogger, event.messageId, event.body)
     expect(mockCompleteMessage).toHaveBeenCalledTimes(1)
+    expect(mockErrorLogger).toHaveBeenCalledTimes(0)
+    expect(mockDeadLetterMessage).toHaveBeenCalledTimes(0)
   })
 
-  test('does NOT dead letter the message if it is invalid according to the schema, and also does not send it to SFD', async () => {
+  test('dead letter the message if it is invalid according to the schema, also does not send it to SFD', async () => {
     const invalidEvent = {
       body: {
         crn: 105,
@@ -67,13 +67,13 @@ describe('processMessageRequest', () => {
     }
     await processMessageRequest(mockedLogger, invalidEvent, mockMessageReceiver)
 
-    expect(mockDeadLetterMessage).toHaveBeenCalledTimes(0)
-    expect(mockErrorLogger).toHaveBeenCalledTimes(1) // this is the error log in the validation function
+    expect(mockErrorLogger).toHaveBeenCalledTimes(1)
+    expect(mockDeadLetterMessage).toHaveBeenCalledTimes(1)
     expect(sendMessageToSingleFrontDoor).toHaveBeenCalledTimes(0)
     expect(mockCompleteMessage).toHaveBeenCalledTimes(0)
   })
 
-  test('dead letters the message if it is valid but an error is thrown in sending it to SFD', async () => {
+  test('dead letter the message if it is valid but an error is thrown in sending it to SFD', async () => {
     const event = {
       body: {
         crn: 1050000003,
@@ -92,8 +92,8 @@ describe('processMessageRequest', () => {
 
     await processMessageRequest(mockedLogger, event, mockMessageReceiver)
 
-    expect(mockDeadLetterMessage).toHaveBeenCalledTimes(1)
     expect(mockErrorLogger).toHaveBeenCalledTimes(1)
+    expect(mockDeadLetterMessage).toHaveBeenCalledTimes(1)
     expect(sendMessageToSingleFrontDoor).toHaveBeenCalledTimes(1)
     expect(mockCompleteMessage).toHaveBeenCalledTimes(0)
   })

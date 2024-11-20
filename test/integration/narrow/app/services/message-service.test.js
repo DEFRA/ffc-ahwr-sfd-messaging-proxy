@@ -28,7 +28,6 @@ describe('sendMessageToSingleFrontDoor', () => {
     customParams: {},
     dateTime: now
   }
-  const emptyInboundMessage = {}
 
   let mockedLogger
 
@@ -52,19 +51,6 @@ describe('sendMessageToSingleFrontDoor', () => {
     expect(outboundMessage).toHaveProperty('id')
   })
 
-  test('throws an error when inbound message is invalid', async () => {
-    await expect(
-      sendMessageToSingleFrontDoor(
-        mockedLogger,
-        inboundMessageQueueId,
-        emptyInboundMessage
-      )
-    ).rejects.toThrow('The inbound message is invalid. "sbi" is required')
-    expect(mockedLogger.error).toHaveBeenCalledWith(
-      'The inbound message is invalid. "sbi" is required. "agreementReference" is required. "notifyTemplateId" is required. "customParams" is required. "dateTime" is required'
-    )
-  })
-
   test('throws an error when fail to store message log database item', async () => {
     set.mockImplementation(() => {
       throw new Error('Faked data persistence error')
@@ -77,10 +63,10 @@ describe('sendMessageToSingleFrontDoor', () => {
         validInboundMessage
       )
     ).rejects.toThrow(
-      'Failed to save single front door message. Faked data persistence error'
+      'Failed to save message log. Faked data persistence error'
     )
     expect(mockedLogger.error).toHaveBeenCalledWith(
-      'Failed to save single front door message. Faked data persistence error'
+      'Failed to save message log. Faked data persistence error'
     )
   })
 
@@ -88,14 +74,13 @@ describe('sendMessageToSingleFrontDoor', () => {
     sendSfdMessageRequest.mockImplementation(() => {
       throw new Error('Faked message send error')
     })
-
     set.mockImplementation(jest.fn())
 
-    await sendMessageToSingleFrontDoor(
+    await expect(sendMessageToSingleFrontDoor(
       mockedLogger,
       inboundMessageQueueId,
       validInboundMessage
-    )
+    )).rejects.toThrow('Failed to send outbound message to SFD')
 
     expect(set).toHaveBeenCalledWith(mockedLogger, {
       agreementReference: 'IAHW-ABC1-5899',

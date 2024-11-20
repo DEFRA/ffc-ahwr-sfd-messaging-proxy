@@ -36,7 +36,7 @@ describe('sendSfdMessageRequest', () => {
     }
   }
 
-  beforeAll(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
 
@@ -57,6 +57,19 @@ describe('sendSfdMessageRequest', () => {
       source: 'ffc-ahwr-sfd-messaging-proxy',
       type: 'uk.gov.ffc.ahwr.submit.sfd.message.request'
     })
+    expect(mockCloseConnection).toHaveBeenCalledTimes(1)
+  })
+
+  test('throws error and closes connection when message to SFD fails', async () => {
+    mockSendMessage.mockImplementation(() => {
+      throw new Error('Failed to send message to the SFD')
+    })
+
+    await expect(sendSfdMessageRequest(outboundMessage)).rejects.toThrow(
+      'Failed to send message to the SFD'
+    )
+
+    expect(mockSendMessage).toHaveBeenCalledTimes(1)
     expect(mockCloseConnection).toHaveBeenCalledTimes(1)
   })
 })
