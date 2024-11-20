@@ -6,8 +6,11 @@ export const sendSfdMessageRequest = async (sfdMessageRequest) => {
   const sender = new MessageSender(sfdMessageTopic)
   const message = createMessage(sfdMessageRequest, sfdMessageRequestMsgType)
 
-  await sender.sendMessage(message)
-  await sender.closeConnection()
+  try {
+    await sender.sendMessage(message)
+  } finally {
+    await sender.closeConnection()
+  }
 }
 
 const createMessage = (body, type) => {

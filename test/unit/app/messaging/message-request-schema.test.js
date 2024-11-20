@@ -37,6 +37,6 @@ describe('validateMessageRequest', () => {
     }
     expect(validateMessageRequest(mockedLogger, event)).toBeFalsy()
     expect(mockErrorLogger).toHaveBeenCalledTimes(1)
-    expect(mockErrorLogger).toHaveBeenCalledWith('Message request validation error, message: ValidationError: "crn" must be greater than or equal to 1050000000')
+    expect(mockErrorLogger).toHaveBeenCalledWith('Inbound message validation error, with message: ValidationError: "crn" must be greater than or equal to 1050000000')
   })
 })
