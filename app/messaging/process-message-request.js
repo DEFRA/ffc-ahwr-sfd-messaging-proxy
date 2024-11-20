@@ -5,8 +5,9 @@ export const processMessageRequest = async (logger, message, receiver) => {
   try {
     logger.warn(`Received sfd message request with id: ${message.messageId}`)
 
-    if (!validateMessageRequest(logger, message.body)) {
-      await receiver.deadLetterMessage(message) // not worth retrying, invalid input
+    const persistentErrorOccurred = !validateMessageRequest(logger, message.body)
+    if (persistentErrorOccurred) {
+      await receiver.deadLetterMessage(message)
       return
     }
 
@@ -14,6 +15,6 @@ export const processMessageRequest = async (logger, message, receiver) => {
     await receiver.completeMessage(message)
   } catch (error) {
     logger.error({ err: error }, 'Message processing failed')
-    await receiver.deadLetterMessage(message) // worth retrying, abandonMessage in future?
+    await receiver.deadLetterMessage(message)
   }
 }
