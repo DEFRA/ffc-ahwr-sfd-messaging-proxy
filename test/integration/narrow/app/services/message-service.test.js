@@ -63,10 +63,10 @@ describe('sendMessageToSingleFrontDoor', () => {
         validInboundMessage
       )
     ).rejects.toThrow(
-      'Failed to save single front door message. Faked data persistence error'
+      'Failed to save message log. Faked data persistence error'
     )
     expect(mockedLogger.error).toHaveBeenCalledWith(
-      'Failed to save single front door message. Faked data persistence error'
+      'Failed to save message log. Faked data persistence error'
     )
   })
 
@@ -80,7 +80,7 @@ describe('sendMessageToSingleFrontDoor', () => {
       mockedLogger,
       inboundMessageQueueId,
       validInboundMessage
-    )).rejects.toThrow('See earlier error.')
+    )).rejects.toThrow('Failed to send outbound message to SFD')
 
     expect(set).toHaveBeenCalledWith(mockedLogger, {
       agreementReference: 'IAHW-ABC1-5899',

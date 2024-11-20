@@ -22,7 +22,7 @@ export const sendMessageToSingleFrontDoor = async (
   )
 
   if (!success) {
-    throw Error('See earlier error.')
+    throw Error('Failed to send outbound message to SFD')
   }
 
   return outboundMessage
@@ -56,7 +56,7 @@ const sendMessageToSfd = async (logger, outboundMessage) => {
     await sendSfdMessageRequest(outboundMessage)
     return { success: true }
   } catch (error) {
-    logger.error({ err: error }, 'Failed to send outbound message to single front door')
+    logger.error({ err: error }, 'Failed to send outbound message to SFD')
     return { success: false }
   }
 }
@@ -93,7 +93,7 @@ const storeMessages = async (
     await set(logger, databaseMessage)
     logger.info('Successfully stored message to database.')
   } catch (error) {
-    const errorMessage = `Failed to save single front door message. ${error.message}`
+    const errorMessage = `Failed to save message log. ${error.message}`
     logger.error(errorMessage)
     throw new Error(errorMessage)
   }
