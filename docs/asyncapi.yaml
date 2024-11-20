@@ -2,15 +2,15 @@ asyncapi: '2.6.0'
 info:
   title: SFD Message Submission
   version: '1.0.0'
-  description: API for submitting and validating SFD claims.
+  description: API for submitting and validating SFD messages.
 channels:
-  sfd.message.submit:
-    description: Channel for submitting SFD claims.
+  ffc-ahwr-sfd-message:
+    description: Channel for submitting SFD messages.
     subscribe:
       summary: Subscribe to submit an SFD message.
-      operationId: submitSfdClaim
+      operationId: SubmitSFDMessage
       message:
-        name: SubmitSFDClaim
+        name: SubmitSFDMessage
         contentType: application/json
         payload:
           type: object
@@ -58,7 +58,7 @@ channels:
               format: date-time
 components:
   schemas:
-    SubmitSFDClaim:
+    SubmitSFDMessage:
       type: object
       required:
         - sbi
