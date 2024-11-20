@@ -1,0 +1,104 @@
+asyncapi: '2.6.0'
+info:
+  title: SFD Message Submission
+  version: '1.0.0'
+  description: API for submitting and validating SFD messages.
+channels:
+  ffc-ahwr-sfd-message:
+    description: Channel for submitting SFD messages.
+    subscribe:
+      summary: Subscribe to submit an SFD message.
+      operationId: SubmitSFDMessage
+      message:
+        name: SubmitSFDMessage
+        contentType: application/json
+        payload:
+          type: object
+          required:
+            - sbi
+            - agreementReference
+            - notifyTemplateId
+            - emailAddress
+            - customParams
+            - dateTime
+          properties:
+            crn:
+              type: string
+              description: Customer reference number.
+              pattern: '^\d{10}$'
+              nullable: true
+            sbi:
+              type: string
+              description: Nine-digit SBI identifier.
+              pattern: '^\d{9}$'
+            agreementReference:
+              type: string
+              description: Reference for the agreement.
+            claimReference:
+              type: string
+              description: Reference for the message.
+              maxLength: 14
+            notifyTemplateId:
+              type: string
+              description: Notify template ID (UUIDv4).
+              format: uuid
+            emailAddress:
+              type: string
+              description: User's email address.
+              format: email
+              pattern: '^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$'
+              minLength: 1
+              maxLength: 320
+            customParams:
+              type: object
+              description: Custom parameters for the message.
+            dateTime:
+              type: string
+              description: Submission date and time.
+              format: date-time
+components:
+  schemas:
+    SubmitSFDMessage:
+      type: object
+      required:
+        - sbi
+        - agreementReference
+        - notifyTemplateId
+        - emailAddress
+        - customParams
+        - dateTime
+      properties:
+        crn:
+          type: string
+          description: Customer reference number.
+          pattern: '^\d{10}$'
+          nullable: true
+        sbi:
+          type: string
+          description: Nine-digit SBI identifier.
+          pattern: '^\d{9}$'
+        agreementReference:
+          type: string
+          description: Reference for the agreement.
+        claimReference:
+          type: string
+          description: Reference for the message.
+          maxLength: 14
+        notifyTemplateId:
+          type: string
+          description: Notify template ID (UUIDv4).
+          format: uuid
+        emailAddress:
+          type: string
+          description: User's email address.
+          format: email
+          pattern: '^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$'
+          minLength: 1
+          maxLength: 320
+        customParams:
+          type: object
+          description: Custom parameters for the message.
+        dateTime:
+          type: string
+          description: Submission date and time.
+          format: date-time
