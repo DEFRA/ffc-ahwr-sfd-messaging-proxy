@@ -99,7 +99,7 @@ describe('sendMessageToSingleFrontDoor', () => {
         inboundMessageQueueId: '298293c75b734f2195c9d1478ccb3dca',
         outboundMessage: {
           data: {
-            commsAddress: 'an@email.com',
+            commsAddresses: 'an@email.com',
             commsType: 'email',
             crn: 1234567890,
             notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d99',
@@ -145,7 +145,7 @@ describe('sendMessageToSingleFrontDoor', () => {
         inboundMessageQueueId: '298293c75b734f2195c9d1478ccb3dca',
         outboundMessage: {
           data: {
-            commsAddress: 'an@email.com',
+            commsAddresses: 'an@email.com',
             commsType: 'email',
             crn: 1234567890,
             notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d99',
@@ -194,7 +194,7 @@ describe('buildOutboundMessage', () => {
         sourceSystem: 'ffc-ahwr',
         notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d99',
         commsType: 'email',
-        commsAddress: 'an@email.com',
+        commsAddresses: 'an@email.com',
         personalisation: {
           reference: 'IAHW-ABC1-5899'
         },
@@ -231,7 +231,7 @@ describe('buildOutboundMessage', () => {
         sourceSystem: 'ffc-ahwr',
         notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d98',
         commsType: 'email',
-        commsAddress: 'an@email.com',
+        commsAddresses: 'an@email.com',
         personalisation: {
           reference: 'IAHW-ABC1-5898'
         },
@@ -269,7 +269,7 @@ describe('buildOutboundMessage', () => {
         sourceSystem: 'ffc-ahwr',
         notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d97',
         commsType: 'email',
-        commsAddress: 'an@email.com',
+        commsAddresses: 'an@email.com',
         personalisation: {
           reference: 'IAHW-ABC1-5897'
         },
@@ -311,7 +311,7 @@ describe('buildOutboundMessage', () => {
         sourceSystem: 'ffc-ahwr',
         notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d96',
         commsType: 'email',
-        commsAddress: 'an@email.com',
+        commsAddresses: 'an@email.com',
         personalisation: {
           reference: 'RESH-F99F-E09F',
           applicationReference: 'IAHW-ABC1-5896',
@@ -355,7 +355,7 @@ describe('buildOutboundMessage', () => {
         sourceSystem: 'ffc-ahwr',
         notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d95',
         commsType: 'email',
-        commsAddress: 'an@email.com',
+        commsAddresses: 'an@email.com',
         personalisation: {
           reference: 'RESH-F99F-E09F',
           applicationReference: 'IAHW-ABC1-5895',

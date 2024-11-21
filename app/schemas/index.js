@@ -30,7 +30,7 @@ export const outboundMessageSchema = joi.object({
       .required(),
     notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
     commsType: 'email',
-    commsAddress: email.required(),
+    commsAddresses: email.required(),
     personalisation: joi.object().required(),
     reference: joi.string().min(1).max(100).required(),
     oneClickUnsubscribeUrl: joi.string().min(1),
