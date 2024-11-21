@@ -28,7 +28,7 @@ describe('sendSfdMessageRequest', () => {
       sourceSystem: 'ffc-ahwr',
       notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d99',
       commsType: 'email',
-      commsAddress: 'an@email.com',
+      commsAddresses: 'an@email.com',
       personalisation: {
         reference: 'IAHW-ABC1-5899'
       },

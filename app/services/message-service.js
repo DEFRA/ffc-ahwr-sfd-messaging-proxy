@@ -44,7 +44,7 @@ export const buildOutboundMessage = (messageId, inboundMessage) => {
       sourceSystem: service,
       notifyTemplateId: inboundMessage.notifyTemplateId,
       commsType: 'email',
-      commsAddress: inboundMessage.emailAddress,
+      commsAddresses: inboundMessage.emailAddress,
       personalisation: inboundMessage.customParams,
       reference: `${service}-${messageId}`
     }
