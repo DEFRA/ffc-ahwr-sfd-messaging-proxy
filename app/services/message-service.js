@@ -1,7 +1,7 @@
 import { set } from '../repositories/message-log-repository.js'
 import { v4 as uuidv4 } from 'uuid'
 import { sendSfdMessageRequest } from '../messaging/forward-message-request-to-sfd.js'
-import { messageLogTableSchema } from '../schemas/index.js'
+import { messageLogTableSchema, outboundMessageSchema } from '../schemas/index.js'
 import { MESSAGE_RESULT_MAP, SOURCE_SYSTEM } from '../constants/index.js'
 
 export const sendMessageToSingleFrontDoor = async (
@@ -31,24 +31,31 @@ export const sendMessageToSingleFrontDoor = async (
 export const buildOutboundMessage = (messageId, inboundMessage) => {
   const service = SOURCE_SYSTEM
 
-  return {
+  const outboundMessage = {
     id: messageId,
     source: service,
     specversion: '1.0.2',
     type: 'uk.gov.ffc.ahwr.comms.request',
     datacontenttype: 'application/json',
-    time: inboundMessage.dateTime.toString(),
+    time: inboundMessage?.dateTime?.toString(),
     data: {
-      crn: inboundMessage.crn,
-      sbi: inboundMessage.sbi,
+      crn: inboundMessage?.crn,
+      sbi: inboundMessage?.sbi,
       sourceSystem: service,
-      notifyTemplateId: inboundMessage.notifyTemplateId,
+      notifyTemplateId: inboundMessage?.notifyTemplateId,
       commsType: 'email',
-      commsAddresses: inboundMessage.emailAddress,
-      personalisation: inboundMessage.customParams,
+      commsAddresses: inboundMessage?.emailAddress,
+      personalisation: inboundMessage?.customParams,
       reference: `${service}-${messageId}`
     }
   }
+
+  const { error } = outboundMessageSchema.validate(outboundMessage, { abortEarly: false })
+  if (error) {
+    throw new Error(`The outbound message is invalid. ${error.message}`)
+  }
+
+  return outboundMessage
 }
 
 const sendMessageToSfd = async (logger, outboundMessage) => {
