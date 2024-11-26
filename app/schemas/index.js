@@ -6,7 +6,7 @@ const SBI_MIN_VALUE = 105000000
 const SBI_MAX_VALUE = 999999999
 const EMAIL_MAX_LENGTH = 320
 
-const crn = joi.number().min(CRN_MIN_VALUE).max(CRN_MAX_VALUE) // TODO AHWR-273 mandatory but successfully processes
+const crn = joi.number().min(CRN_MIN_VALUE).max(CRN_MAX_VALUE)
 const sbi = joi.number().min(SBI_MIN_VALUE).max(SBI_MAX_VALUE).required()
 const email = joi.string()
   .pattern(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/)
@@ -35,8 +35,6 @@ export const outboundMessageSchema = joi.object({
     reference: joi.string().min(1).max(100).required(),
     oneClickUnsubscribeUrl: joi.string().min(1),
     emailReplyToId: joi.string().guid({ version: 'uuidv4' })
-    // TODO AHWR-273 mandatory but successfully processes, statusDetails: object, required
-    // TODO AHWR-273 mandatory but successfully processes, correlationId: uuid, required
   })
     .required()
 })
