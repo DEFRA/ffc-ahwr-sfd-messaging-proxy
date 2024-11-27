@@ -29,8 +29,8 @@ export const outboundMessageSchema = joi.object({
       .pattern(/^[a-z0-9-_]+$/)
       .required(),
     notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
-    commsType: 'email',
-    commsAddresses: email.required(),
+    commsType: joi.string().valid('email').required(),
+    commsAddresses: email.required(), // Note: array has maxItems: 10
     personalisation: joi.object().required(),
     reference: joi.string().min(1).max(100).required(),
     oneClickUnsubscribeUrl: joi.string().min(1),

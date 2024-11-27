@@ -170,78 +170,14 @@ describe('sendMessageToSingleFrontDoor', () => {
 })
 
 describe('buildOutboundMessage', () => {
-  test('verify input and output for: Farmer Apply - confirm existing user V3.0', async () => {
-    const messageId = uuidv4()
-    const inputApplyExisting = {
-      crn: 1234567890,
-      sbi: 123456789,
-      agreementReference: 'IAHW-ABC1-5899',
-      notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d99',
-      emailAddress: 'an@email.com',
-      customParams: { reference: 'IAHW-ABC1-5899' },
-      dateTime: '2024-11-08T16:54:03.210Z'
-    }
-    const expectedOutput = {
-      id: messageId,
-      source: 'ffc-ahwr',
-      specversion: '1.0.2',
-      datacontenttype: 'application/json',
-      type: 'uk.gov.ffc.ahwr.comms.request',
-      time: '2024-11-08T16:54:03.210Z',
-      data: {
-        crn: 1234567890,
-        sbi: 123456789,
-        sourceSystem: 'ffc-ahwr',
-        notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d99',
-        commsType: 'email',
-        commsAddresses: 'an@email.com',
-        personalisation: {
-          reference: 'IAHW-ABC1-5899'
-        },
-        reference: `ffc-ahwr-${messageId}`
-      }
+  test('throws error when inbound message invalid', () => {
+    const invalidInboundMessage = {
+      dateTime: now
     }
 
-    expect(buildOutboundMessage(messageId, inputApplyExisting)).toStrictEqual(
-      expectedOutput
-    )
-  })
-
-  test('verify input and output for: Farmer Apply - confirm new user V3.0', async () => {
-    const messageId = uuidv4()
-    const inputApplyNew = {
-      crn: 1234567890,
-      sbi: 123456789,
-      agreementReference: 'IAHW-ABC1-5898',
-      notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d98',
-      emailAddress: 'an@email.com',
-      customParams: { reference: 'IAHW-ABC1-5898' },
-      dateTime: '2024-11-08T16:54:03.210Z'
-    }
-    const expectedOutput = {
-      id: messageId,
-      source: 'ffc-ahwr',
-      specversion: '1.0.2',
-      datacontenttype: 'application/json',
-      type: 'uk.gov.ffc.ahwr.comms.request',
-      time: '2024-11-08T16:54:03.210Z',
-      data: {
-        crn: 1234567890,
-        sbi: 123456789,
-        sourceSystem: 'ffc-ahwr',
-        notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d98',
-        commsType: 'email',
-        commsAddresses: 'an@email.com',
-        personalisation: {
-          reference: 'IAHW-ABC1-5898'
-        },
-        reference: `ffc-ahwr-${messageId}`
-      }
-    }
-
-    expect(buildOutboundMessage(messageId, inputApplyNew)).toStrictEqual(
-      expectedOutput
-    )
+    expect(() => {
+      buildOutboundMessage(uuidv4(), invalidInboundMessage)
+    }).toThrow('The outbound message is invalid.')
   })
 
   test('verify input and output for: Farmer Claim - Complete', async () => {
