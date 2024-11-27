@@ -171,10 +171,12 @@ describe('sendMessageToSingleFrontDoor', () => {
 
 describe('buildOutboundMessage', () => {
   test('throws error when inbound message invalid', () => {
-    const emptyInboundMessage = {}
+    const invalidInboundMessage = {
+      dateTime: now
+    }
 
     expect(() => {
-      buildOutboundMessage(uuidv4(), emptyInboundMessage)
+      buildOutboundMessage(uuidv4(), invalidInboundMessage)
     }).toThrow('The outbound message is invalid.')
   })
 
