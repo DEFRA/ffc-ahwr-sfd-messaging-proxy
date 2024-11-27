@@ -37,15 +37,15 @@ export const buildOutboundMessage = (messageId, inboundMessage) => {
     specversion: '1.0.2',
     type: 'uk.gov.ffc.ahwr.comms.request',
     datacontenttype: 'application/json',
-    time: inboundMessage?.dateTime?.toString(),
+    time: inboundMessage.dateTime.toString(),
     data: {
-      crn: inboundMessage?.crn,
-      sbi: inboundMessage?.sbi,
+      crn: inboundMessage.crn,
+      sbi: inboundMessage.sbi,
       sourceSystem: service,
-      notifyTemplateId: inboundMessage?.notifyTemplateId,
+      notifyTemplateId: inboundMessage.notifyTemplateId,
       commsType: 'email',
-      commsAddresses: inboundMessage?.emailAddress,
-      personalisation: inboundMessage?.customParams,
+      commsAddresses: inboundMessage.emailAddress,
+      personalisation: inboundMessage.customParams,
       reference: `${service}-${messageId}`
     }
   }
