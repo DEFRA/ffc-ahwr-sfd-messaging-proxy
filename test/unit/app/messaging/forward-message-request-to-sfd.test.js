@@ -3,6 +3,14 @@ import { sendSfdMessageRequest } from '../../../../app/messaging/forward-message
 const mockSendMessage = jest.fn()
 const mockCloseConnection = jest.fn()
 
+jest.mock('../../../../app/config/index', () => ({
+  config: {
+    messageQueueConfig: {
+      sfdMessageTopic: 'fake-topic-name',
+      sfdMessageRequestMsgType: 'uk.gov.ffc.ahwr.submit.sfd.message.request'
+    }
+  }
+}))
 jest.mock('ffc-messaging', () => {
   const MockMessageSender = jest.fn().mockImplementation(() => ({
     closeConnection: mockCloseConnection,
@@ -32,7 +40,8 @@ describe('sendSfdMessageRequest', () => {
       personalisation: {
         reference: 'IAHW-ABC1-5899'
       },
-      reference: 'ffc-ahwr-AAA123'
+      reference: 'ffc-ahwr-AAA123',
+      emailReplyToId: 'c3e9149b-9490-4321-808c-72e709d9d814'
     }
   }
 

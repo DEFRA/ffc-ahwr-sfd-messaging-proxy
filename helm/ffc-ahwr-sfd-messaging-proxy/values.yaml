@@ -46,6 +46,7 @@ container:
   messageQueueHost: namespace.servicebus.windows.net
   sfdMessageRequestQueueAddress: ffc-ahwr-sfd-message
   sfdMessageTopicAddress: ffc-ahwr-sfd-msg-request
+  sfdEmailReplyToId: c3e9149b-9490-4321-808c-72e709d9d814
 
 postgresService:
   postgresDb: ffc_ahwr_sfd_messaging_proxy

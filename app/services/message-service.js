@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { sendSfdMessageRequest } from '../messaging/forward-message-request-to-sfd.js'
 import { messageLogTableSchema, outboundMessageSchema } from '../schemas/index.js'
 import { MESSAGE_RESULT_MAP, SOURCE_SYSTEM } from '../constants/index.js'
+import { config } from '../config/index.js'
 
 export const sendMessageToSingleFrontDoor = async (
   logger,
@@ -30,6 +31,7 @@ export const sendMessageToSingleFrontDoor = async (
 
 export const buildOutboundMessage = (messageId, inboundMessage) => {
   const service = SOURCE_SYSTEM
+  const sfdEmailReplyToId = config.sfdEmailReplyToId
 
   const outboundMessage = {
     id: messageId,
@@ -46,7 +48,8 @@ export const buildOutboundMessage = (messageId, inboundMessage) => {
       commsType: 'email',
       commsAddresses: inboundMessage.emailAddress,
       personalisation: inboundMessage.customParams,
-      reference: `${service}-${messageId}`
+      reference: `${service}-${messageId}`,
+      emailReplyToId: sfdEmailReplyToId
     }
   }
 

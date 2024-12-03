@@ -11,4 +11,5 @@ data:
   MESSAGE_QUEUE_HOST: {{ quote .Values.container.messageQueueHost }}
   SFDMESSAGEREQUEST_QUEUE_ADDRESS: {{ quote .Values.container.sfdMessageRequestQueueAddress }}
   SFDMESSAGE_TOPIC_ADDRESS: {{ quote .Values.container.sfdMessageTopicAddress }}
+  SFD_EMAIL_REPLYTO_ID: {{ quote .Values.container.sfdEmailReplyToId }}
 {{- end -}}
