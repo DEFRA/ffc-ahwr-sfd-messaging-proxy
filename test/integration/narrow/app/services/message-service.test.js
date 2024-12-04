@@ -5,6 +5,10 @@ import {
 } from '../../../../../app/services/message-service'
 import { set } from '../../../../../app/repositories/message-log-repository'
 import { sendSfdMessageRequest } from '../../../../../app/messaging/forward-message-request-to-sfd'
+import { config } from '../../../../../app/config/index.js'
+
+const now = new Date().toISOString()
+const SFD_EMAIL_REPLYTO_ID = 'c3e9149b-9490-4321-808c-72e709d9d814'
 
 jest.mock('../../../../../app/repositories/message-log-repository', () => ({
   set: jest.fn()
@@ -14,7 +18,9 @@ jest.mock('../../../../../app/messaging/forward-message-request-to-sfd', () => (
   sendSfdMessageRequest: jest.fn()
 }))
 
-const now = new Date().toISOString()
+jest.mock('../../../../../app/config/index', () => ({
+  config: { sfdEmailReplyToId: SFD_EMAIL_REPLYTO_ID }
+}))
 
 describe('sendMessageToSingleFrontDoor', () => {
   const inboundMessageQueueId = '298293c75b734f2195c9d1478ccb3dca'
@@ -106,7 +112,8 @@ describe('sendMessageToSingleFrontDoor', () => {
             personalisation: {},
             reference: expect.any(String),
             sbi: 123456789,
-            sourceSystem: 'ffc-ahwr'
+            sourceSystem: 'ffc-ahwr',
+            emailReplyToId: SFD_EMAIL_REPLYTO_ID
           },
           datacontenttype: 'application/json',
           id: expect.any(String),
@@ -152,7 +159,8 @@ describe('sendMessageToSingleFrontDoor', () => {
             personalisation: {},
             reference: expect.any(String),
             sbi: 123456789,
-            sourceSystem: 'ffc-ahwr'
+            sourceSystem: 'ffc-ahwr',
+            emailReplyToId: SFD_EMAIL_REPLYTO_ID
           },
           datacontenttype: 'application/json',
           id: expect.any(String),
@@ -170,6 +178,11 @@ describe('sendMessageToSingleFrontDoor', () => {
 })
 
 describe('buildOutboundMessage', () => {
+  beforeEach(() => {
+    jest.resetAllMocks()
+    jest.replaceProperty(config, 'sfdEmailReplyToId', SFD_EMAIL_REPLYTO_ID)
+  })
+
   test('throws error when inbound message invalid', () => {
     const invalidInboundMessage = {
       dateTime: now
@@ -177,6 +190,24 @@ describe('buildOutboundMessage', () => {
 
     expect(() => {
       buildOutboundMessage(uuidv4(), invalidInboundMessage)
+    }).toThrow('The outbound message is invalid.')
+  })
+
+  test('throws error when outbound message invalid due to no replyToId', () => {
+    jest.replaceProperty(config, 'sfdEmailReplyToId', undefined)
+    const validInboundMessage = {
+      crn: 1234567890,
+      sbi: 123456789,
+      agreementReference: 'IAHW-ABC1-5897',
+      claimReference: 'RESH-F99F-E09F',
+      notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d97',
+      emailAddress: 'an@email.com',
+      customParams: { reference: 'IAHW-ABC1-5897' },
+      dateTime: '2024-11-08T16:54:03.210Z'
+    }
+
+    expect(() => {
+      buildOutboundMessage(uuidv4(), validInboundMessage)
     }).toThrow('The outbound message is invalid.')
   })
 
@@ -209,7 +240,8 @@ describe('buildOutboundMessage', () => {
         personalisation: {
           reference: 'IAHW-ABC1-5897'
         },
-        reference: `ffc-ahwr-${messageId}`
+        reference: `ffc-ahwr-${messageId}`,
+        emailReplyToId: SFD_EMAIL_REPLYTO_ID
       }
     }
 
@@ -253,7 +285,8 @@ describe('buildOutboundMessage', () => {
           applicationReference: 'IAHW-ABC1-5896',
           amount: '123.45'
         },
-        reference: `ffc-ahwr-${messageId}`
+        reference: `ffc-ahwr-${messageId}`,
+        emailReplyToId: SFD_EMAIL_REPLYTO_ID
       }
     }
 
@@ -297,7 +330,8 @@ describe('buildOutboundMessage', () => {
           applicationReference: 'IAHW-ABC1-5895',
           amount: '123.45'
         },
-        reference: `ffc-ahwr-${messageId}`
+        reference: `ffc-ahwr-${messageId}`,
+        emailReplyToId: SFD_EMAIL_REPLYTO_ID
       }
     }
 
