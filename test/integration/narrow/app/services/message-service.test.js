@@ -118,7 +118,7 @@ describe('sendMessageToSingleFrontDoor', () => {
           datacontenttype: 'application/json',
           id: expect.any(String),
           source: 'ffc-ahwr',
-          specversion: '1.0.2',
+          specversion: '2.0.0',
           time: now,
           type: 'uk.gov.ffc.ahwr.comms.request'
         }
@@ -165,7 +165,7 @@ describe('sendMessageToSingleFrontDoor', () => {
           datacontenttype: 'application/json',
           id: expect.any(String),
           source: 'ffc-ahwr',
-          specversion: '1.0.2',
+          specversion: '2.0.0',
           time: now,
           type: 'uk.gov.ffc.ahwr.comms.request'
         }
@@ -226,7 +226,7 @@ describe('buildOutboundMessage', () => {
     const expectedOutput = {
       id: messageId,
       source: 'ffc-ahwr',
-      specversion: '1.0.2',
+      specversion: '2.0.0',
       datacontenttype: 'application/json',
       type: 'uk.gov.ffc.ahwr.comms.request',
       time: '2024-11-08T16:54:03.210Z',
@@ -269,7 +269,7 @@ describe('buildOutboundMessage', () => {
     const expectedOutput = {
       id: messageId,
       source: 'ffc-ahwr',
-      specversion: '1.0.2',
+      specversion: '2.0.0',
       datacontenttype: 'application/json',
       type: 'uk.gov.ffc.ahwr.comms.request',
       time: '2024-11-08T16:54:03.210Z',
@@ -314,7 +314,7 @@ describe('buildOutboundMessage', () => {
     const expectedOutput = {
       id: messageId,
       source: 'ffc-ahwr',
-      specversion: '1.0.2',
+      specversion: '2.0.0',
       datacontenttype: 'application/json',
       type: 'uk.gov.ffc.ahwr.comms.request',
       time: '2024-11-08T16:54:03.210Z',
