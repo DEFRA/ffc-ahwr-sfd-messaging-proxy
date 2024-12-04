@@ -26,7 +26,7 @@ describe('sendSfdMessageRequest', () => {
   const outboundMessage = {
     id: 'AAA123',
     source: 'ffc-ahwr',
-    specversion: '1.0.2',
+    specversion: '2.0.0',
     datacontenttype: 'application/json',
     type: 'uk.gov.ffc.ahwr.comms.request',
     time: '2024-11-08T16:54:03.210Z',
