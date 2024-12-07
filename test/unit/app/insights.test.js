@@ -1,9 +1,8 @@
 import { setup } from '../../../app/insights'
 
-const mockInfoLogger = jest.fn()
-
+const mockLoggerSetBindings = jest.fn()
 const mockedLogger = {
-  info: mockInfoLogger
+  setBindings: mockLoggerSetBindings
 }
 
 const mockStart = jest.fn()
@@ -39,8 +38,10 @@ describe('Application Insights', () => {
     setup(mockedLogger)
 
     expect(mockStart).toHaveBeenCalledTimes(1)
-    expect(mockInfoLogger).toHaveBeenCalledTimes(1)
-    expect(mockInfoLogger).toHaveBeenCalledWith('App Insights running')
+    expect(mockLoggerSetBindings).toHaveBeenCalledTimes(1)
+    expect(mockLoggerSetBindings).toHaveBeenCalledWith({
+      appInsightsRunning: true
+    })
   })
 
   test('logs not running when env var does not exist', () => {
@@ -48,7 +49,9 @@ describe('Application Insights', () => {
     setup(mockedLogger)
 
     expect(mockStart).toHaveBeenCalledTimes(0)
-    expect(mockInfoLogger).toHaveBeenCalledTimes(1)
-    expect(mockInfoLogger).toHaveBeenCalledWith('App Insights not running')
+    expect(mockLoggerSetBindings).toHaveBeenCalledTimes(1)
+    expect(mockLoggerSetBindings).toHaveBeenCalledWith({
+      appInsightsRunning: false
+    })
   })
 })

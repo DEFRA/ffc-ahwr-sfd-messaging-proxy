@@ -5,7 +5,10 @@ import { processMessageRequest } from './process-message-request.js'
 let sfdMessageReceiver
 
 export const startSfdMessageReceiver = async (logger) => {
-  const sfdMessageAction = (message) => processMessageRequest(logger, message, sfdMessageReceiver)
+  const sfdMessageAction = (message) => {
+    const childLogger = logger.child({}) // reset context
+    processMessageRequest(childLogger, message, sfdMessageReceiver)
+  }
 
   sfdMessageReceiver = new MessageReceiver(
     config.messageQueueConfig.sfdMessageRequestQueue,
@@ -13,7 +16,7 @@ export const startSfdMessageReceiver = async (logger) => {
   )
 
   await sfdMessageReceiver.subscribe()
-  logger.warn('Ready to receive messages')
+  logger.setBindings({ sfdMessageReceiverReady: true })
 }
 
 export const stopSfdMessageReceiver = async () => {

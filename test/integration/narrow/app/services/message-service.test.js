@@ -22,6 +22,11 @@ jest.mock('../../../../../app/config/index', () => ({
   config: { sfdEmailReplyToId: SFD_EMAIL_REPLYTO_ID }
 }))
 
+const mockSetBindingsLogger = jest.fn()
+const mockedLogger = {
+  setBindings: mockSetBindingsLogger
+}
+
 describe('sendMessageToSingleFrontDoor', () => {
   const inboundMessageQueueId = '298293c75b734f2195c9d1478ccb3dca'
   const validInboundMessage = {
@@ -35,16 +40,8 @@ describe('sendMessageToSingleFrontDoor', () => {
     dateTime: now
   }
 
-  let mockedLogger
-
   beforeEach(() => {
     jest.resetAllMocks()
-
-    mockedLogger = jest.fn(() => ({
-      warn: jest.fn(),
-      error: jest.fn(),
-      info: jest.fn()
-    }))()
   })
 
   test('returns message with id when processing is successful', async () => {
@@ -53,8 +50,13 @@ describe('sendMessageToSingleFrontDoor', () => {
       inboundMessageQueueId,
       validInboundMessage
     )
+
     expect(outboundMessage).not.toBeNull()
     expect(outboundMessage).toHaveProperty('id')
+    expect(mockSetBindingsLogger).toHaveBeenCalledTimes(1)
+    expect(mockSetBindingsLogger).toHaveBeenCalledWith({
+      messageLogCreatedWithId: expect.any(String)
+    })
   })
 
   test('throws an error when fail to store message log database item', async () => {
@@ -71,9 +73,8 @@ describe('sendMessageToSingleFrontDoor', () => {
     ).rejects.toThrow(
       'Failed to save message log. Faked data persistence error'
     )
-    expect(mockedLogger.error).toHaveBeenCalledWith(
-      'Failed to save message log. Faked data persistence error'
-    )
+
+    expect(mockSetBindingsLogger).toHaveBeenCalledTimes(0)
   })
 
   test('stores that the message was not sent, if the SFD request fails', async () => {
@@ -88,7 +89,7 @@ describe('sendMessageToSingleFrontDoor', () => {
       validInboundMessage
     )).rejects.toThrow('Failed to send outbound message to SFD')
 
-    expect(set).toHaveBeenCalledWith(mockedLogger, {
+    expect(set).toHaveBeenCalledWith({
       agreementReference: 'IAHW-ABC1-5899',
       claimReference: 'RESH-F99F-E09F',
       data: {
@@ -137,7 +138,7 @@ describe('sendMessageToSingleFrontDoor', () => {
       claimReference: undefined
     })
 
-    expect(set).toHaveBeenCalledWith(mockedLogger, {
+    expect(set).toHaveBeenCalledWith({
       agreementReference: 'IAHW-ABC1-5899',
       data: {
         inboundMessage: {
