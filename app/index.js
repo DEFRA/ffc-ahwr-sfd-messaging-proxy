@@ -2,12 +2,14 @@ import { setup } from './insights.js'
 import 'log-timestamp'
 import { startSfdMessageReceiver, stopSfdMessageReceiver } from './messaging/index.js'
 import server from './server.js'
+import logger from './logger.js'
 
 const init = async () => {
-  await startSfdMessageReceiver(server.logger)
+  await server.register([logger])
   await server.start()
-
   setup(server.logger)
+
+  await startSfdMessageReceiver(server.logger)
 
   server.logger.info(`Server running on ${server.info.uri}`)
 }

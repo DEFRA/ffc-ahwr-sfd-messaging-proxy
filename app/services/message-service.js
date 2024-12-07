@@ -66,7 +66,7 @@ const sendMessageToSfd = async (logger, outboundMessage) => {
     await sendSfdMessageRequest(outboundMessage)
     return { success: true }
   } catch (error) {
-    logger.error({ err: error }, 'Failed to send outbound message to SFD')
+    logger.setBindings({ sfdCommunicationError: error })
     return { success: false }
   }
 }
@@ -100,11 +100,9 @@ const storeMessages = async (
   })
 
   try {
-    await set(logger, databaseMessage)
-    logger.info('Successfully stored message to database.')
+    await set(databaseMessage)
+    logger.setBindings({ messageLogCreatedWithId: databaseMessage.id })
   } catch (error) {
-    const errorMessage = `Failed to save message log. ${error.message}`
-    logger.error(errorMessage)
-    throw new Error(errorMessage)
+    throw new Error(`Failed to save message log. ${error.message}`)
   }
 }
