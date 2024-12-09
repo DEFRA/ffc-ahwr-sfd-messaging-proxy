@@ -10,7 +10,8 @@ const mockErrorLogger = jest.fn()
 const mockedLogger = {
   warn: jest.fn(),
   error: mockErrorLogger,
-  info: jest.fn()
+  info: jest.fn(),
+  setBindings: jest.fn()
 }
 
 const mockSubscribe = jest.fn()

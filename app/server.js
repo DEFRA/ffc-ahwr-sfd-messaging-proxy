@@ -4,27 +4,29 @@ import { config } from './config.js'
 import { healthRoutes } from './routes/health.js'
 import logger from './logger.js'
 
-const server = hapi.server({
-  host: config.get('host'),
-  port: config.get('port'),
-  routes: {
-    validate: {
-      options: {
-        abortEarly: false
+const startServer = async () => {
+  const server = hapi.server({
+    host: config.get('host'),
+    port: config.get('port'),
+    routes: {
+      validate: {
+        options: {
+          abortEarly: false
+        }
       }
+    },
+    router: {
+      stripTrailingSlash: true
     }
-  },
-  router: {
-    stripTrailingSlash: true
-  }
-})
+  })
 
-server.validator(joi)
+  server.validator(joi)
 
-server.route([...healthRoutes])
+  await server.register([logger])
 
-const plugins = [logger]
+  server.route([...healthRoutes])
 
-server.register(plugins)
+  return server
+}
 
-export default server
+export default startServer

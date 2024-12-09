@@ -42,4 +42,13 @@ describe('App config', () => {
       require('../../../../app/config/index.js')
     }).toThrowError('The server config is invalid. "env" must be one of [development, test, production]')
   })
+
+  test('port should be undefined when environment variable not set', () => {
+    process.env.NODE_ENV = testData.nodeEnv
+    process.env.SFD_EMAIL_REPLYTO_ID = testData.sfdEmailReplyToId
+
+    const { config } = require('../../../../app/config/index.js')
+
+    expect(config.port).toBe(undefined)
+  })
 })

@@ -1,11 +1,8 @@
 import { validateMessageRequest } from '../../../../app/messaging/message-request-schema'
 
-const mockErrorLogger = jest.fn()
-
+const mockSetBindingsLogger = jest.fn()
 const mockedLogger = {
-  warn: jest.fn(),
-  error: mockErrorLogger,
-  info: jest.fn()
+  setBindings: mockSetBindingsLogger
 }
 
 describe('validateMessageRequest', () => {
@@ -21,7 +18,7 @@ describe('validateMessageRequest', () => {
       dateTime: new Date()
     }
     expect(validateMessageRequest(mockedLogger, event)).toBeTruthy()
-    expect(mockErrorLogger).toHaveBeenCalledTimes(0)
+    expect(mockSetBindingsLogger).toHaveBeenCalledTimes(0)
   })
 
   test('it returns false if the validation is unsuccessful', () => {
@@ -36,7 +33,9 @@ describe('validateMessageRequest', () => {
       dateTime: new Date()
     }
     expect(validateMessageRequest(mockedLogger, event)).toBeFalsy()
-    expect(mockErrorLogger).toHaveBeenCalledTimes(1)
-    expect(mockErrorLogger).toHaveBeenCalledWith(expect.any(Object), 'Inbound message validation error')
+    expect(mockSetBindingsLogger).toHaveBeenCalledTimes(1)
+    expect(mockSetBindingsLogger).toHaveBeenCalledWith({
+      validationError: expect.any(Object)
+    })
   })
 })

@@ -1,7 +1,10 @@
-import server from '../../../../app/server.js'
+import startServer from '../../../../app/server.js'
 
 describe('healthy test', () => {
+  let server
+
   beforeEach(async () => {
+    server = await startServer()
     await server.initialize()
   })
 
