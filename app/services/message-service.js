@@ -36,7 +36,7 @@ export const buildOutboundMessage = (messageId, inboundMessage) => {
   const outboundMessage = {
     id: messageId,
     source: service,
-    specversion: '1.0.2',
+    specversion: '2.0.0',
     type: 'uk.gov.ffc.ahwr.comms.request',
     datacontenttype: 'application/json',
     time: inboundMessage.dateTime.toString(),
