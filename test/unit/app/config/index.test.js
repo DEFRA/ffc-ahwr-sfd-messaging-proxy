@@ -44,6 +44,7 @@ describe('App config', () => {
   })
 
   test('port should be undefined when environment variable not set', () => {
+    process.env.PORT = undefined
     process.env.NODE_ENV = testData.nodeEnv
     process.env.SFD_EMAIL_REPLYTO_ID = testData.sfdEmailReplyToId
 
