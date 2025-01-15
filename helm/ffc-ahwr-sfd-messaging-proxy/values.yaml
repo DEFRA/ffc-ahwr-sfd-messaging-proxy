@@ -8,7 +8,7 @@ image: ffc-ahwr-sfd-messaging-proxy
 
 labels: {}
 
-aadPodIdentity: true
+workloadIdentity: true
 
 appInsights:
   connectionString:
@@ -50,7 +50,7 @@ container:
 
 postgresService:
   postgresDb: ffc_ahwr_sfd_messaging_proxy
-  postgresExternalName: namespace.postgres.database.azure.com
+  postgresqlHost: namespace.postgres.database.azure.com
   postgresPort: 5432
   postgresSchema: public
   postgresUser: postgres
