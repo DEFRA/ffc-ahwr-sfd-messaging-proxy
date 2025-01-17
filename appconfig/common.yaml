@@ -1,0 +1,2 @@
+container.sfdMessageRequestQueueAddress: queue:ffc-ahwr-sfd-message
+container.sfdMessageTopicAddress: topic:ffc-ahwr-sfd-msg-request

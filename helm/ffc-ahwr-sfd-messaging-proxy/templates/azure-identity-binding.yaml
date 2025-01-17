@@ -1,5 +1,0 @@
-{{- if .Values.azureIdentity.enabled }}
-{{- include "ffc-helm-library.azure-identity-binding" (list . "ffc-ahwr-sfd-messaging-proxy.azure-identity-binding") -}}
-{{- end }}
-{{- define "ffc-ahwr-sfd-messaging-proxy.azure-identity-binding" -}}
-{{- end -}}

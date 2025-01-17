@@ -1,0 +1,15 @@
+resources:
+  identity: ahwr-sfd-messaging-proxy
+  postgreSql:
+    name: ffc-ahwr-sfd-messaging-proxy
+    extensions:
+      - name: uuid-ossp
+  queues:
+    - name: ffc-ahwr-sfd-message
+      role: receiver
+      session: false
+  topics:
+    - name: ffc-ahwr-sfd-msg-request
+      role: sender
+    - name: fcp-fd-comms
+      role: sender
