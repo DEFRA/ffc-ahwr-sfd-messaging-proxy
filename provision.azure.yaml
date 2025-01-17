@@ -11,7 +11,5 @@ resources:
   topics:
     - name: ffc-ahwr-sfd-msg-request
       role: sender
-      session: false
     - name: fcp-fd-comms
       role: sender
-      session: false
