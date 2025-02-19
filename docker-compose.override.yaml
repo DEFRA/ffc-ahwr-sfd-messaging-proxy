@@ -7,6 +7,8 @@ services:
       target: development
     image: ffc-ahwr-sfd-messaging-proxy-development
     container_name: ffc-ahwr-sfd-messaging-proxy-development
+    environment:
+      USE_PRETTY_PRINT: ${USE_PRETTY_PRINT:-true}
     ports:
       - "3007:3000"
       - "9237:9229"

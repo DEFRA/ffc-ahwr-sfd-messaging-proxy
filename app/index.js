@@ -1,5 +1,4 @@
 import { setup } from './insights.js'
-import 'log-timestamp'
 import { startSfdMessageReceiver, stopSfdMessageReceiver } from './messaging/index.js'
 import startServer from './server.js'
 
