@@ -340,4 +340,29 @@ describe('buildOutboundMessage', () => {
       buildOutboundMessage(messageId, inputClaimEndemicFollowup)
     ).toStrictEqual(expectedOutput)
   })
+
+  test('verify input and output with optional replyToId', async () => {
+    const messageId = uuidv4()
+    const inputClaimEndemicFollowup = {
+      crn: 1234567890,
+      sbi: 123456789,
+      agreementReference: 'IAHW-ABC1-5895',
+      claimReference: 'RESH-F99F-E09F',
+      notifyTemplateId: '123456fc-9999-40c1-a11d-85f55aff4d95',
+      emailReplyToId: '123456fc-9999-40c1-a11d-85f55aff4999',
+      emailAddress: 'an@email.com',
+      customParams: {
+        reference: 'RESH-F99F-E09F',
+        applicationReference: 'IAHW-ABC1-5895',
+        amount: '123.45'
+      },
+      dateTime: '2024-11-08T16:54:03.210Z'
+    }
+
+    const { data: { emailReplyToId } } = buildOutboundMessage(messageId, inputClaimEndemicFollowup)
+
+    expect(
+      emailReplyToId
+    ).toStrictEqual('123456fc-9999-40c1-a11d-85f55aff4999')
+  })
 })
