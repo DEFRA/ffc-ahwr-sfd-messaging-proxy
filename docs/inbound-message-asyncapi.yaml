@@ -42,6 +42,10 @@ channels:
               type: string
               description: Notify template ID (UUIDv4).
               format: uuid
+            emailReplyToId:
+              type: string
+              description: Notify replay to email address ID (UUIDv4).
+              format: uuid
             emailAddress:
               type: string
               description: User's email address.
@@ -87,6 +91,10 @@ components:
         notifyTemplateId:
           type: string
           description: Notify template ID (UUIDv4).
+          format: uuid
+        emailReplyToId:
+          type: string
+          description: Notify replay to email address ID (UUIDv4).
           format: uuid
         emailAddress:
           type: string

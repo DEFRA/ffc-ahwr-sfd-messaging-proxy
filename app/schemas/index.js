@@ -45,6 +45,7 @@ export const inboundMessageSchema = joi.object({
   agreementReference: joi.string().required(),
   claimReference: joi.string().max(14), // NOSONAR
   notifyTemplateId: joi.string().guid({ version: 'uuidv4' }).required(),
+  emailReplyToId: joi.string().guid({ version: 'uuidv4' }).optional(),
   emailAddress: email,
   customParams: joi.object().required(),
   dateTime: joi.date().required()

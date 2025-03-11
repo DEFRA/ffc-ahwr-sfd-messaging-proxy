@@ -31,7 +31,7 @@ export const sendMessageToSingleFrontDoor = async (
 
 export const buildOutboundMessage = (messageId, inboundMessage) => {
   const service = SOURCE_SYSTEM
-  const sfdEmailReplyToId = config.sfdEmailReplyToId
+  const defaultSfdEmailReplyToId = config.sfdEmailReplyToId
 
   const outboundMessage = {
     id: messageId,
@@ -49,7 +49,7 @@ export const buildOutboundMessage = (messageId, inboundMessage) => {
       commsAddresses: inboundMessage.emailAddress,
       personalisation: inboundMessage.customParams,
       reference: `${service}-${messageId}`,
-      emailReplyToId: sfdEmailReplyToId
+      emailReplyToId: inboundMessage.emailReplyToId ?? defaultSfdEmailReplyToId
     }
   }
 

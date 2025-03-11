@@ -39,7 +39,7 @@ services:
       - ./scripts:/scripts
 
   ffc-ahwr-sfd-messaging-proxy-postgres:
-    image: postgres:11.4-alpine
+    image: postgres:16.4-alpine
     environment: *common-postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
