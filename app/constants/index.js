@@ -4,5 +4,6 @@ export const MESSAGE_RESULT_MAP = {
   unknown: 'UNKNOWN',
   unsent: 'UNSENT',
   sent: 'SENT',
-  failed: 'FAILED'
+  failed: 'FAILED',
+  requested: 'REQUESTED'
 }

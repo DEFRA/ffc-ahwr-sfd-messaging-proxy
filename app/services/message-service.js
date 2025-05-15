@@ -1,4 +1,4 @@
-import { set } from '../repositories/message-log-repository.js'
+import { set, update } from '../repositories/message-log-repository.js'
 import { v4 as uuidv4 } from 'uuid'
 import { sendSfdMessageRequest } from '../messaging/forward-message-request-to-sfd.js'
 import { messageLogTableSchema, outboundMessageSchema } from '../schemas/index.js'
@@ -10,17 +10,20 @@ export const sendMessageToSingleFrontDoor = async (
   inboundMessageQueueId,
   inboundMessage
 ) => {
-  const outboundMessage = buildOutboundMessage(uuidv4(), inboundMessage)
+  const outboundMessageId = uuidv4()
+  logger.setBindings({ outboundMessageId })
+  const outboundMessage = buildOutboundMessage(outboundMessageId, inboundMessage)
 
-  const { success } = await sendMessageToSfd(logger, outboundMessage)
-
-  await storeMessages(
+  await storeMessage(
     logger,
     inboundMessageQueueId,
     inboundMessage,
-    outboundMessage,
-    success
+    outboundMessage
   )
+
+  const { success } = await sendMessageToSfd(logger, outboundMessage)
+
+  await updateMessageLog(outboundMessageId, success)
 
   if (!success) {
     throw Error('Failed to send outbound message to SFD')
@@ -71,12 +74,11 @@ const sendMessageToSfd = async (logger, outboundMessage) => {
   }
 }
 
-const storeMessages = async (
+const storeMessage = async (
   logger,
   inboundMessageQueueId,
   inboundMessage,
-  outboundMessage,
-  outboundMessageSuccessful
+  outboundMessage
 ) => {
   const databaseMessage = {
     id: outboundMessage.id,
@@ -87,9 +89,7 @@ const storeMessages = async (
       inboundMessage,
       outboundMessage
     },
-    status: outboundMessageSuccessful
-      ? MESSAGE_RESULT_MAP.unknown
-      : MESSAGE_RESULT_MAP.unsent,
+    status: MESSAGE_RESULT_MAP.unknown,
     ...(inboundMessage.claimReference
       ? { claimReference: inboundMessage.claimReference }
       : {})
@@ -104,5 +104,17 @@ const storeMessages = async (
     logger.setBindings({ messageLogCreatedWithId: databaseMessage.id })
   } catch (error) {
     throw new Error(`Failed to save message log. ${error.message}`)
+  }
+}
+
+const updateMessageLog = async (messageId, outboundMessageSuccessful) => {
+  try {
+    await update(messageId, {
+      status: outboundMessageSuccessful
+        ? MESSAGE_RESULT_MAP.requested
+        : MESSAGE_RESULT_MAP.unsent
+    })
+  } catch (error) {
+    throw new Error(`Failed to update message log. ${error.message}`)
   }
 }

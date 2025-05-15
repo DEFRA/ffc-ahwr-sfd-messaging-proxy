@@ -3,7 +3,7 @@ import {
   sendMessageToSingleFrontDoor,
   buildOutboundMessage
 } from '../../../../../app/services/message-service'
-import { set } from '../../../../../app/repositories/message-log-repository'
+import { set, update } from '../../../../../app/repositories/message-log-repository'
 import { sendSfdMessageRequest } from '../../../../../app/messaging/forward-message-request-to-sfd'
 import { config } from '../../../../../app/config/index.js'
 
@@ -11,7 +11,8 @@ const now = new Date().toISOString()
 const SFD_EMAIL_REPLYTO_ID = 'c3e9149b-9490-4321-808c-72e709d9d814'
 
 jest.mock('../../../../../app/repositories/message-log-repository', () => ({
-  set: jest.fn()
+  set: jest.fn(),
+  update: jest.fn()
 }))
 
 jest.mock('../../../../../app/messaging/forward-message-request-to-sfd', () => ({
@@ -53,9 +54,11 @@ describe('sendMessageToSingleFrontDoor', () => {
 
     expect(outboundMessage).not.toBeNull()
     expect(outboundMessage).toHaveProperty('id')
-    expect(mockSetBindingsLogger).toHaveBeenCalledTimes(1)
     expect(mockSetBindingsLogger).toHaveBeenCalledWith({
       messageLogCreatedWithId: expect.any(String)
+    })
+    expect(mockSetBindingsLogger).toHaveBeenCalledWith({
+      outboundMessageId: expect.any(String)
     })
   })
 
@@ -74,7 +77,9 @@ describe('sendMessageToSingleFrontDoor', () => {
       'Failed to save message log. Faked data persistence error'
     )
 
-    expect(mockSetBindingsLogger).toHaveBeenCalledTimes(0)
+    expect(sendSfdMessageRequest).toHaveBeenCalledTimes(0)
+    expect(update).toHaveBeenCalledTimes(0)
+    expect(mockSetBindingsLogger).toHaveBeenCalledTimes(1)
   })
 
   test('stores that the message was not sent, if the SFD request fails', async () => {
@@ -125,12 +130,14 @@ describe('sendMessageToSingleFrontDoor', () => {
         }
       },
       id: expect.any(String),
-      status: 'UNSENT', // <-------- This is the important bit!
+      status: 'UNKNOWN', // <-------- This is the important bit!
       templateId: '123456fc-9999-40c1-a11d-85f55aff4d99'
     })
+
+    expect(update).toHaveBeenCalledWith(expect.any(String), { status: 'UNSENT' })
   })
 
-  test('stores the message with no claim reference if it does not exist on the inbound message, and a status of UNKNOWN if the sfd message was sent ok', async () => {
+  test('stores the message with no claim reference if it does not exist on the inbound message, and a status of REQUESTED if the sfd message was sent ok', async () => {
     set.mockImplementation(jest.fn())
 
     await sendMessageToSingleFrontDoor(mockedLogger, inboundMessageQueueId, {
@@ -175,6 +182,8 @@ describe('sendMessageToSingleFrontDoor', () => {
       status: 'UNKNOWN', // <-------- This is the important bit!
       templateId: '123456fc-9999-40c1-a11d-85f55aff4d99'
     })
+
+    expect(update).toHaveBeenCalledWith(expect.any(String), { status: 'REQUESTED' })
   })
 })
 
