@@ -40,7 +40,7 @@ const options = {
   formatters: {
     level: (level) => ({ level })
   },
-  ignorePaths: ['healthy', 'healthz'],
+  ignorePaths: ['/healthy', '/healthz'],
   serializers: {
     req,
     res,
