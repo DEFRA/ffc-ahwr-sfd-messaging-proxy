@@ -1,10 +1,12 @@
-export const piiRedactRequestHandlers = [
+import HttpStatus from "http-status-codes";
+
+export const redactPiiRequestHandlers = [
   {
     method: 'POST',
     path: '/api/redact/pii',
     handler: async (request, h) => {
-      request.logger.info('Request for PII redact received')
-      return h.response().code(200)
+      request.logger.info(`Request for redact PII received, agreementsToRedact: ${request.body}`)
+      return h.response().code(HttpStatus.OK)
     }
   }
 ]
