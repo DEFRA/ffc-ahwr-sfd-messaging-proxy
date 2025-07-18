@@ -1,6 +1,6 @@
 {
   "name": "ffc-ahwr-sfd-messaging-proxy",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Proxies messages through to Single Frontdoor (SFD) service",
   "homepage": "https://github.com/DEFRA/ffc-ahwr-sfd-messaging-proxy",
   "main": "app/index.js",
@@ -13,7 +13,7 @@
     "test:debug": "node --inspect-brk=0.0.0.0 ./node_modules/jest/bin/jest.js --coverage=false --onlyChanged --watch --runInBand --no-cache",
     "start:watch": "nodemon --inspect=0.0.0.0 --ext js --legacy-watch app/index.js",
     "start:debug": "nodemon --inspect-brk=0.0.0.0 --ext js --legacy-watch app/index.js",
-    "lint-fix": "standard --fix"
+    "lint:fix": "standard --fix"
   },
   "author": "Defra",
   "contributors": [
@@ -29,6 +29,7 @@
     "dotenv": "^16.4.7",
     "ffc-messaging": "^2.10.2",
     "hapi-pino": "12.1.0",
+    "http-status-codes": "^2.3.0",
     "joi": "17.13.3",
     "pg": "^8.13.1",
     "sequelize": "^6.37.5",
