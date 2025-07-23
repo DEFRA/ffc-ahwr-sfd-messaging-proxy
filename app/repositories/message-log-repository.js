@@ -32,8 +32,9 @@ export const redactPII = async (agreementReference) => {
           Sequelize.literal(`'"${REDACT_PII_VALUES.REDACTED_EMAIL}"'`)
       )
 
+  // TODO 1067 add logging to say what was updated? 
   // eslint-disable-next-line no-unused-vars
-  // const [_, updates] = await models.application.update(
+  // const [_, updates] = await models.messageLog.update(
   await models.messageLog.update(
     { data },
     {
@@ -41,30 +42,4 @@ export const redactPII = async (agreementReference) => {
       returning: true
     }
   )
-
-  // TODO 1067 add later
-  // const [updatedRecord] = updates
-  // const { updatedAt, data: { organisation: { sbi } } } = updatedRecord.dataValues
-
-  // const eventData = {
-  //   applicationReference: reference,
-  //   reference,
-  //   updatedProperty,
-  //   newValue,
-  //   oldValue,
-  //   note
-  // }
-  // const type = `application-${updatedProperty}`
-  // await claimDataUpdateEvent(eventData, type, user, updatedAt, sbi)
-
-  // await buildData.models.claim_update_history.create({
-  //   applicationReference: reference,
-  //   reference,
-  //   note,
-  //   updatedProperty,
-  //   newValue,
-  //   oldValue,
-  //   eventType: type,
-  //   createdBy: user
-  // })
 }
