@@ -1,4 +1,4 @@
-import { set, update } from '../../../../app/repositories/message-log-repository'
+import { redactPII, set, update } from '../../../../app/repositories/message-log-repository'
 import dataModeller from '../../../../app/data/index.js'
 
 jest.mock('../../../../app/data/index.js', () => {
@@ -24,5 +24,39 @@ describe('message log repository', () => {
     update('id1', testData)
     expect(dataModeller.models.messageLog.update).toHaveBeenCalledTimes(1)
     expect(dataModeller.models.messageLog.update).toHaveBeenCalledWith({ status: 'a-status' }, { where: { id: 'id1' } })
+  })
+
+  describe('redactPII', () => {
+    const mockLogger = { info: jest.fn() }
+
+    test('should call messageLog.update with correct parameters', async () => {
+      const agreementReference = 'AHWR-123'
+      const mockUpdatedRows = [{ id: 1 }, { id: 2 }]
+      dataModeller.models.messageLog.update.mockResolvedValue([mockUpdatedRows.length, mockUpdatedRows])
+
+      await redactPII(agreementReference, mockLogger)
+
+      expect(dataModeller.models.messageLog.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.any(Object) }),
+        expect.objectContaining({
+          where: { agreementReference },
+          returning: true
+        })
+      )
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        `Redacted PII in ${mockUpdatedRows.length} message(s) for agreementReference: ${agreementReference}`
+      )
+    })
+
+    test('should log when no messages are updated', async () => {
+      const agreementReference = 'AHWR-123'
+      dataModeller.models.messageLog.update.mockResolvedValue([0, []])
+
+      await redactPII(agreementReference, mockLogger)
+
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        `No messages updated for agreementReference: ${agreementReference}`
+      )
+    })
   })
 })
