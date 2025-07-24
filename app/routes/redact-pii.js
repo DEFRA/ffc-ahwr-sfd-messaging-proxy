@@ -9,7 +9,7 @@ export const redactPiiRequestHandlers = [
       request.logger.info('Request for redact PII received')
 
       request.payload.agreementsToRedact.forEach(agreementToRedact => {
-        redactPII(agreementToRedact.reference)
+        redactPII(agreementToRedact.reference, request.logger)
       })
 
       return h.response().code(HttpStatus.OK)
