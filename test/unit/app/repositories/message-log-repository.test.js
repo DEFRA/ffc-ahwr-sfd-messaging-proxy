@@ -1,5 +1,6 @@
 import { redactPII, set, update } from '../../../../app/repositories/message-log-repository'
 import dataModeller from '../../../../app/data/index.js'
+import { Op } from 'sequelize'
 
 jest.mock('../../../../app/data/index.js', () => {
   return {
@@ -29,6 +30,10 @@ describe('message log repository', () => {
   describe('redactPII', () => {
     const mockLogger = { info: jest.fn() }
 
+    beforeEach(async () => {
+      jest.clearAllMocks()
+    })
+
     test('should call messageLog.update with correct parameters', async () => {
       const agreementReference = 'AHWR-123'
       const mockUpdatedRows = [{ id: 1 }, { id: 2 }]
@@ -39,13 +44,24 @@ describe('message log repository', () => {
       expect(dataModeller.models.messageLog.update).toHaveBeenCalledWith(
         expect.objectContaining({ data: expect.any(Object) }),
         expect.objectContaining({
-          where: { agreementReference },
-          returning: true
+          where: {
+            agreementReference: 'AHWR-123',
+            [Op.and]: { val: "data->'outboundMessage'->'data'->'commsAddresses' IS NOT NULL" }
+          }
         })
       )
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        `Redacted PII in ${mockUpdatedRows.length} message(s) for agreementReference: ${agreementReference}`
+      expect(dataModeller.models.messageLog.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.any(Object) }),
+        expect.objectContaining({
+          where: {
+            agreementReference: 'AHWR-123',
+            [Op.and]: { val: "data->'inboundMessage'->'emailAddress' IS NOT NULL" }
+          }
+        })
       )
+      expect(mockLogger.info).toHaveBeenCalledWith("Redacted field at path 'inboundMessage,emailAddress' in 2 message(s) for agreementReference: AHWR-123")
+      expect(mockLogger.info).toHaveBeenCalledWith("Redacted field at path 'outboundMessage,data,commsAddresses' in 2 message(s) for agreementReference: AHWR-123")
+      expect(mockLogger.info).toHaveBeenCalledWith('Total redacted fields across messages: 4 for agreementReference: AHWR-123')
     })
 
     test('should log when no messages are updated', async () => {
