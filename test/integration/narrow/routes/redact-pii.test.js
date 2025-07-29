@@ -5,8 +5,8 @@ import { redactPII } from '../../../../app/repositories/message-log-repository.j
 jest.mock('../../../../app/repositories/message-log-repository.js')
 
 const mockAgreementsToRedact = [
-  { reference: 'FAKE-REF-1', sbi: 'FAKE-SBI-1', redactID: 'FAKE-REDACT-ID-1' },
-  { reference: 'FAKE-REF-2', sbi: 'FAKE-SBI-2', redactID: 'FAKE-REDACT-ID-2' }
+  { reference: 'FAKE-REF-1' },
+  { reference: 'FAKE-REF-2' }
 ]
 
 describe('redact-pii', () => {
