@@ -8,9 +8,10 @@ export const redactPiiRequestHandlers = [
     handler: async (request, h) => {
       request.logger.info('Request for redact PII received')
 
-      request.payload.agreementsToRedact.forEach(agreementToRedact => {
-        redactPII(agreementToRedact.reference, request.logger)
-      })
+      await Promise.all(
+        request.payload.agreementsToRedact.map(async (agreementToRedact) => {
+          await redactPII(agreementToRedact.reference, request.logger)
+        }))
 
       return h.response().code(HttpStatus.OK)
     }
