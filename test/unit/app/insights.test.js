@@ -22,6 +22,8 @@ jest.mock('applicationinsights', () => {
 
 describe('Application Insights', () => {
   beforeEach(() => {
+    delete process.env.APPINSIGHTS_CLOUDROLE
+    delete process.env.APPINSIGHTS_CONNECTIONSTRING
     jest.clearAllMocks()
   })
 
