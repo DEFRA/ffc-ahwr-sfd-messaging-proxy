@@ -1,4 +1,4 @@
-import startServer from '../../../../app/server.js'
+import { startServer } from '../../../../app/server.js'
 
 describe('Server test', () => {
   let server

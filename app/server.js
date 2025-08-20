@@ -5,7 +5,7 @@ import { healthRoutes } from './routes/health.js'
 import { redactPiiRequestHandlers } from './routes/redact-pii.js'
 import logger from './logger.js'
 
-const startServer = async () => {
+export const startServer = async () => {
   const server = hapi.server({
     host: config.get('host'),
     port: config.get('port'),
@@ -29,5 +29,3 @@ const startServer = async () => {
 
   return server
 }
-
-export default startServer

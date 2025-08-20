@@ -1,13 +1,12 @@
 import appInsights from 'applicationinsights'
 
-export const setup = (logger) => {
+export const setup = () => {
   if (process.env.APPINSIGHTS_CONNECTIONSTRING) {
     appInsights.setup(process.env.APPINSIGHTS_CONNECTIONSTRING).start()
-    logger.setBindings({ appInsightsRunning: true })
     const cloudRoleTag = appInsights.defaultClient.context.keys.cloudRole
-    const appName = process.env.APPINSIGHTS_CLOUDROLE
-    appInsights.defaultClient.context.tags[cloudRoleTag] = appName
-  } else {
-    logger.setBindings({ appInsightsRunning: false })
+    appInsights.defaultClient.context.tags[cloudRoleTag] = process.env.APPINSIGHTS_CLOUDROLE ?? 'ffc-ahwr-sfd-messaging-proxy'
+    return true
   }
+
+  return false
 }

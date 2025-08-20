@@ -1,4 +1,4 @@
-import startServer from '../../../../app/server.js'
+import { startServer } from '../../../../app/server.js'
 import HttpStatus from 'http-status-codes'
 import { redactPII } from '../../../../app/repositories/message-log-repository.js'
 

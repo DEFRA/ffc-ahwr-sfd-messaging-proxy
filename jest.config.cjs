@@ -34,6 +34,9 @@ module.exports = {
       'jest-skipped-reporter'
     ]
   ],
+  setupFilesAfterEnv: [
+    '<rootDir>/test/setup.js'
+  ],
   testEnvironment: 'node',
   transform: {
     '^.+\\.[t|j]sx?$': 'babel-jest'

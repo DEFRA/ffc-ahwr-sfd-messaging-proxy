@@ -1,10 +1,5 @@
 import { setup } from '../../../app/insights'
 
-const mockLoggerSetBindings = jest.fn()
-const mockedLogger = {
-  setBindings: mockLoggerSetBindings
-}
-
 const mockStart = jest.fn()
 
 jest.mock('applicationinsights', () => {
@@ -30,28 +25,30 @@ describe('Application Insights', () => {
     jest.clearAllMocks()
   })
 
-  test('sets up insights when the connection string env var is defined', () => {
-    const appName = 'test-app'
-    process.env.APPINSIGHTS_CLOUDROLE = appName
+  test('sets up insights and returns true when the connection string env var is defined', () => {
+    process.env.APPINSIGHTS_CLOUDROLE = 'test-app'
     process.env.APPINSIGHTS_CONNECTIONSTRING = 'something'
 
-    setup(mockedLogger)
+    const result = setup()
 
+    expect(result).toBeTruthy()
     expect(mockStart).toHaveBeenCalledTimes(1)
-    expect(mockLoggerSetBindings).toHaveBeenCalledTimes(1)
-    expect(mockLoggerSetBindings).toHaveBeenCalledWith({
-      appInsightsRunning: true
-    })
   })
 
-  test('logs not running when env var does not exist', () => {
-    delete process.env.APPINSIGHTS_CONNECTIONSTRING
-    setup(mockedLogger)
+  test('sets up insights and returns true when the connection string env var is defined - using default app name', () => {
+    process.env.APPINSIGHTS_CONNECTIONSTRING = 'something'
 
+    const result = setup()
+
+    expect(result).toBeTruthy()
+    expect(mockStart).toHaveBeenCalledTimes(1)
+  })
+
+  test('returns false when env var does not exist', () => {
+    delete process.env.APPINSIGHTS_CONNECTIONSTRING
+    const result = setup()
+
+    expect(result).toBeFalsy()
     expect(mockStart).toHaveBeenCalledTimes(0)
-    expect(mockLoggerSetBindings).toHaveBeenCalledTimes(1)
-    expect(mockLoggerSetBindings).toHaveBeenCalledWith({
-      appInsightsRunning: false
-    })
   })
 })
