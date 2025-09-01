@@ -13,12 +13,14 @@ export const update = async (id, data) => {
     { where: { id } })
 }
 
-export const redactPII = async (agreementReference, logger) => {
+export const redactPII = async (agreementReference, redactedSbi, logger) => {
   const { models } = dataModeller
 
   const redactedValueByJSONPath = {
     'inboundMessage,emailAddress': REDACT_PII_VALUES.REDACTED_EMAIL,
-    'outboundMessage,data,commsAddresses': REDACT_PII_VALUES.REDACTED_EMAIL
+    'inboundMessage,sbi': redactedSbi,
+    'outboundMessage,data,commsAddresses': REDACT_PII_VALUES.REDACTED_EMAIL,
+    'outboundMessage,data,sbi': redactedSbi
   }
 
   let totalUpdates = 0

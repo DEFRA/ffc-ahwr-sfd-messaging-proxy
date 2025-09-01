@@ -39,7 +39,7 @@ describe('message log repository', () => {
       const mockUpdatedRows = [{ id: 1 }, { id: 2 }]
       dataModeller.models.messageLog.update.mockResolvedValue([mockUpdatedRows.length, mockUpdatedRows])
 
-      await redactPII(agreementReference, mockLogger)
+      await redactPII(agreementReference, '103592529', mockLogger)
 
       expect(dataModeller.models.messageLog.update).toHaveBeenCalledWith(
         expect.objectContaining({ data: expect.any(Object) }),
@@ -55,7 +55,25 @@ describe('message log repository', () => {
         expect.objectContaining({
           where: {
             agreementReference: 'AHWR-123',
+            [Op.and]: { val: "data->'outboundMessage'->'data'->'sbi' IS NOT NULL" }
+          }
+        })
+      )
+      expect(dataModeller.models.messageLog.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.any(Object) }),
+        expect.objectContaining({
+          where: {
+            agreementReference: 'AHWR-123',
             [Op.and]: { val: "data->'inboundMessage'->'emailAddress' IS NOT NULL" }
+          }
+        })
+      )
+      expect(dataModeller.models.messageLog.update).toHaveBeenCalledWith(
+        expect.objectContaining({ data: expect.any(Object) }),
+        expect.objectContaining({
+          where: {
+            agreementReference: 'AHWR-123',
+            [Op.and]: { val: "data->'inboundMessage'->'sbi' IS NOT NULL" }
           }
         })
       )
@@ -68,7 +86,7 @@ describe('message log repository', () => {
       const agreementReference = 'AHWR-123'
       dataModeller.models.messageLog.update.mockResolvedValue([0, []])
 
-      await redactPII(agreementReference, mockLogger)
+      await redactPII(agreementReference, '103592529', mockLogger)
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         `No messages updated for agreementReference: ${agreementReference}`
