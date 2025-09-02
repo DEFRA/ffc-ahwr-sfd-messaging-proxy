@@ -78,8 +78,10 @@ describe('message log repository', () => {
         })
       )
       expect(mockLogger.info).toHaveBeenCalledWith("Redacted field at path 'inboundMessage,emailAddress' in 2 message(s) for agreementReference: AHWR-123")
+      expect(mockLogger.info).toHaveBeenCalledWith("Redacted field at path 'inboundMessage,sbi' in 2 message(s) for agreementReference: AHWR-123")
       expect(mockLogger.info).toHaveBeenCalledWith("Redacted field at path 'outboundMessage,data,commsAddresses' in 2 message(s) for agreementReference: AHWR-123")
-      expect(mockLogger.info).toHaveBeenCalledWith('Total redacted fields across messages: 4 for agreementReference: AHWR-123')
+      expect(mockLogger.info).toHaveBeenCalledWith("Redacted field at path 'outboundMessage,data,commsAddresses' in 2 message(s) for agreementReference: AHWR-123")
+      expect(mockLogger.info).toHaveBeenCalledWith('Total redacted fields across messages: 8 for agreementReference: AHWR-123')
     })
 
     test('should log when no messages are updated', async () => {
