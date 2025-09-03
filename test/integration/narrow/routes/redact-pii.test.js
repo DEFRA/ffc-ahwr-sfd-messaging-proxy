@@ -5,8 +5,8 @@ import { redactPII } from '../../../../app/repositories/message-log-repository.j
 jest.mock('../../../../app/repositories/message-log-repository.js')
 
 const mockAgreementsToRedact = [
-  { reference: 'FAKE-REF-1' },
-  { reference: 'FAKE-REF-2' }
+  { reference: 'FAKE-REF-1', redactedSbi: '1035925291' },
+  { reference: 'FAKE-REF-2', redactedSbi: '1455925291' }
 ]
 
 describe('redact-pii', () => {
@@ -23,8 +23,8 @@ describe('redact-pii', () => {
       const res = await server.inject({ method: 'POST', url: '/api/redact/pii', payload: { agreementsToRedact: mockAgreementsToRedact } })
 
       expect(redactPII).toHaveBeenCalledTimes(2)
-      expect(redactPII).toHaveBeenCalledWith('FAKE-REF-1', expect.any(Object))
-      expect(redactPII).toHaveBeenCalledWith('FAKE-REF-2', expect.any(Object))
+      expect(redactPII).toHaveBeenCalledWith('FAKE-REF-1', '1035925291', expect.any(Object))
+      expect(redactPII).toHaveBeenCalledWith('FAKE-REF-2', '1455925291', expect.any(Object))
       expect(res.statusCode).toBe(HttpStatus.OK)
     })
   })
