@@ -7,6 +7,8 @@ services:
       target: development
     image: ffc-ahwr-sfd-messaging-proxy-development
     container_name: ffc-ahwr-sfd-messaging-proxy-development
+    depends_on:
+      - ffc-ahwr-sfd-messaging-proxy-postgres
     environment:
       USE_PRETTY_PRINT: ${USE_PRETTY_PRINT:-true}
     ports:
@@ -17,8 +19,13 @@ services:
       - ./package.json:/home/node/package.json
 
   ffc-ahwr-sfd-messaging-proxy-postgres:
+    image: postgres:16.8-alpine
     ports:
       - "5437:5432"
+    environment:
+      POSTGRES_DB: ffc_ahwr_sfd_messaging_proxy
+      POSTGRES_PASSWORD: ppp
+      POSTGRES_USERNAME: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
