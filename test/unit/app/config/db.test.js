@@ -15,6 +15,11 @@ describe('DB config', () => {
   })
 
   test('defaults used to populate all fields where not explicitly set', async () => {
+    delete process.env.POSTGRES_PORT
+    delete process.env.POSTGRES_DB
+    delete process.env.POSTGRES_HOST
+    delete process.env.POSTGRES_SCHEMA_NAME
+
     const { config } = require('../../../../app/config/db.js') // This style of dynamic import is needed to get the process.env setting to work properly
 
     expect(config).toHaveProperty('development')
@@ -22,7 +27,7 @@ describe('DB config', () => {
     expect(config).toHaveProperty('production')
     expect(config).toHaveProperty('test.database', 'ffc_ahwr_sfd_messaging_proxy')
     expect(config).toHaveProperty('test.host', 'ffc-ahwr-sfd-messaging-proxy-postgres')
-    expect(config).toHaveProperty('test.port', '5432')
+    expect(config).toHaveProperty('test.port', 5432)
     expect(config).toHaveProperty('test.schema', 'public')
   })
 

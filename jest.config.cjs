@@ -15,9 +15,7 @@ module.exports = {
     '<rootDir>/test/',
     '<rootDir>/jest.config.js',
     '<rootDir>/app/data',
-    '<rootDir>/app/index.js',
-    '<rootDir>/app/messaging/index.js',
-    '<rootDir>/app/config/db.js'
+    '<rootDir>/app/index.js'
   ],
   modulePathIgnorePatterns: [
     'node_modules'
