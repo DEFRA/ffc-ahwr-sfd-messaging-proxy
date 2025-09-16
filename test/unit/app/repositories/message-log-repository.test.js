@@ -39,7 +39,7 @@ describe('message log repository', () => {
       const mockUpdatedRows = [{ id: 1 }, { id: 2 }]
       dataModeller.models.messageLog.update.mockResolvedValue([mockUpdatedRows.length, mockUpdatedRows])
 
-      await redactPII(agreementReference, '103592529', mockLogger)
+      await redactPII(agreementReference, mockLogger)
 
       expect(dataModeller.models.messageLog.update).toHaveBeenCalledWith(
         expect.objectContaining({ data: expect.any(Object) }),
@@ -55,40 +55,20 @@ describe('message log repository', () => {
         expect.objectContaining({
           where: {
             agreementReference: 'AHWR-123',
-            [Op.and]: { val: "data->'outboundMessage'->'data'->'sbi' IS NOT NULL" }
-          }
-        })
-      )
-      expect(dataModeller.models.messageLog.update).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.any(Object) }),
-        expect.objectContaining({
-          where: {
-            agreementReference: 'AHWR-123',
             [Op.and]: { val: "data->'inboundMessage'->'emailAddress' IS NOT NULL" }
           }
         })
       )
-      expect(dataModeller.models.messageLog.update).toHaveBeenCalledWith(
-        expect.objectContaining({ data: expect.any(Object) }),
-        expect.objectContaining({
-          where: {
-            agreementReference: 'AHWR-123',
-            [Op.and]: { val: "data->'inboundMessage'->'sbi' IS NOT NULL" }
-          }
-        })
-      )
       expect(mockLogger.info).toHaveBeenCalledWith("Redacted field at path 'inboundMessage,emailAddress' in 2 message(s) for agreementReference: AHWR-123")
-      expect(mockLogger.info).toHaveBeenCalledWith("Redacted field at path 'inboundMessage,sbi' in 2 message(s) for agreementReference: AHWR-123")
       expect(mockLogger.info).toHaveBeenCalledWith("Redacted field at path 'outboundMessage,data,commsAddresses' in 2 message(s) for agreementReference: AHWR-123")
-      expect(mockLogger.info).toHaveBeenCalledWith("Redacted field at path 'outboundMessage,data,commsAddresses' in 2 message(s) for agreementReference: AHWR-123")
-      expect(mockLogger.info).toHaveBeenCalledWith('Total redacted fields across messages: 8 for agreementReference: AHWR-123')
+      expect(mockLogger.info).toHaveBeenCalledWith('Total redacted fields across messages: 4 for agreementReference: AHWR-123')
     })
 
     test('should log when no messages are updated', async () => {
       const agreementReference = 'AHWR-123'
       dataModeller.models.messageLog.update.mockResolvedValue([0, []])
 
-      await redactPII(agreementReference, '103592529', mockLogger)
+      await redactPII(agreementReference, mockLogger)
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         `No messages updated for agreementReference: ${agreementReference}`
