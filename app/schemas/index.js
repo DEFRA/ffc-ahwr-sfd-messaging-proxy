@@ -4,14 +4,11 @@ const CRN_MIN_VALUE = 1050000000
 const CRN_MAX_VALUE = 9999999999
 const SBI_MIN_VALUE = 105000000
 const SBI_MAX_VALUE = 999999999
-const EMAIL_MAX_LENGTH = 320
 
 const crn = joi.number().min(CRN_MIN_VALUE).max(CRN_MAX_VALUE)
 const sbi = joi.number().min(SBI_MIN_VALUE).max(SBI_MAX_VALUE).required()
 const email = joi.string()
-  .pattern(/^[\w-\\.]+@([\w-]+\.)+[\w-]{2,4}$/)
-  .min(1)
-  .max(EMAIL_MAX_LENGTH)
+  .email({ tlds: false })
 
 export const outboundMessageSchema = joi.object({
   id: joi.string().guid({ version: 'uuidv4' }).required(),
