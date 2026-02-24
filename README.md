@@ -1,3 +1,5 @@
+# ⚠️ Note this repository is being archived, and is replaced by the backend service at https://github.com/DEFRA/ahwr-sfd-comms-proxy/ ⚠️
+
 # FFC AHWR SFD Messaging Proxy
 
 > Proxies messages through to Single Frontdoor (SFD) service
